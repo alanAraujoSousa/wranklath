@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:jdbc.properties" />
+	</bean>
+
+	<!-- DataSource Definition -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver_class}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="maxActive" value="90" />
+		<property name="testOnBorrow" value="true" />
+		<property name="validationQuery" value="SELECT 1" />
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager"
+		p:sessionFactory-ref="sessionFactory">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- Session factory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+
+		<property name="annotatedClasses">
+			<list>
+				<value>br.com.engine.persistence.beans.User</value>
+				<value>br.com.engine.persistence.beans.UserGroup</value>
+				<value>br.com.engine.persistence.beans.Permission</value>
+				<value>br.com.engine.persistence.beans.Session</value>
+			</list>
+		</property>
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">false</prop>
+				<prop key="hibernate.bytecode.use_reflection_optimizer">true</prop>
+				<prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</prop>
+				<prop key="hibernate.jdbc.batch_size">20</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="jdbcExceptionTranslator"
+		class="org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+
+	<!-- Hibernate util's definitions -->
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="hibernateUtil" class="br.com.engine.persistence.core.HibernateUtil"
+		factory-method="init">
+		<constructor-arg ref="hibernateTemplate" />
+	</bean>
+
+	<!-- DAO's definitions -->
+	<bean id="genericDAO" abstract="true"
+		class="br.com.engine.persistence.core.GenericDAO" >
+		<property name="hibernateUtil" ref="hibernateUtil" />
+	</bean>
+
+	<bean id="userDAO" class="br.com.engine.persistence.dao.UserDAO"
+		autowire="byType" />
+		
+	<bean id="userGroupDAO" class="br.com.engine.persistence.dao.UserGroupDAO"
+		autowire="byType" />
+		
+	<bean id="sessionDAO" class="br.com.engine.persistence.dao.SessionDAO"
+		autowire="byType" />
+		
+	<bean id="permissionDAO" class="br.com.engine.persistence.dao.PermissionDAO"
+		autowire="byType" />
+		
+
+</beans>
