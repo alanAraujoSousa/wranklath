@@ -1,4 +1,4 @@
-package br.com.engine.service.rest.context;
+package br.com.engine.controller.rest.context;
 
 import java.lang.reflect.Method;
 
@@ -12,15 +12,15 @@ import org.springframework.stereotype.Component;
 
 import br.com.commons.annotations.Authorize;
 import br.com.commons.enums.PermissionEnum;
-import br.com.engine.business.controller.UserController;
-import br.com.engine.service.rest.filters.AuthorizationRestFilter;
+import br.com.engine.business.service.UserService;
+import br.com.engine.controller.rest.filters.AuthorizationRestFilter;
 
 @Component
 @Provider
 public class AuthorizationFeature implements DynamicFeature {
 
 	@Autowired
-	UserController userController;
+	UserService userService;
 
 	@Override
 	public void configure(ResourceInfo resourceInfo, FeatureContext context) {
@@ -31,7 +31,7 @@ public class AuthorizationFeature implements DynamicFeature {
 			PermissionEnum[] permissionsRequired = authenticate.value();
 			
 			AuthorizationRestFilter authenticationFilter = new AuthorizationRestFilter(
-					userController, permissionsRequired);
+					userService, permissionsRequired);
 			
 			context.register(authenticationFilter);
 		}

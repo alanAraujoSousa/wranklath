@@ -14,5 +14,5 @@
 		
 	<bean id="contextApplicationContextProvider" class="br.com.engine.context.ApplicationContextProvider" />
 	
-    <bean id="userController" class="br.com.engine.business.controller.UserController" autowire="byType"/> 
+    <bean id="userService" class="br.com.engine.business.service.UserService" autowire="byType"/> 
 </beans>	

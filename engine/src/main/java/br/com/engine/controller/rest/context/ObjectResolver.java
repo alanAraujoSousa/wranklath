@@ -1,4 +1,4 @@
-package br.com.engine.service.rest.context;
+package br.com.engine.controller.rest.context;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;

@@ -1,4 +1,4 @@
-package br.com.engine.business.controller;
+package br.com.engine.business.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,9 +28,9 @@ import br.com.engine.persistence.dao.UserDAO;
 import br.com.engine.persistence.dao.UserGroupDAO;
 
 @Transactional(propagation = Propagation.REQUIRED)
-public class UserController {
+public class UserService {
 
-	private static final Logger LOGGER = Logger.getLogger(UserController.class);
+	private static final Logger LOGGER = Logger.getLogger(UserService.class);
 
 	@Autowired
 	private UserDAO userDAO;

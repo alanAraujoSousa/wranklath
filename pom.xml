@@ -16,14 +16,14 @@
 		<JUNIT_VERSION>4.11</JUNIT_VERSION>
 	</properties>
 	<dependencies>
-	
+
 		<!-- JUNIT -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${JUNIT_VERSION}</version>
 		</dependency>
-		
+
 		<!-- ASPECTS -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -56,6 +56,11 @@
 
 		<!-- Utils -->
 		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>javax.el-api</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
 			<version>3.19.0-GA</version>
@@ -81,7 +86,7 @@
 			<version>2.2</version>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<defaultGoal>install</defaultGoal>
 		<plugins>

@@ -1,4 +1,4 @@
-package br.com.engine.service.filters;
+package br.com.engine.controller.rest.filters;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;

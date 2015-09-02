@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,7 +15,7 @@ public class UserTest extends LoginRestTest {
 
 	@Test
 	@Rollback(false)
-	@Ignore
+//	@Ignore
 	public void listUsers() throws Exception {
 
 		String url = "/user";
@@ -31,7 +30,7 @@ public class UserTest extends LoginRestTest {
 
 	@Test
 	@Rollback(false)
-//	@Ignore
+	@Ignore
 	public void deleteUser() throws Exception {
 
 		String userLogin = "loginQualquer";
@@ -54,7 +53,7 @@ public class UserTest extends LoginRestTest {
 		userObject.setName("NomeQualquer");
 
 		clientResource.path(url).request().header("token", token)
-				.post(Entity.entity(userObject, MediaType.APPLICATION_JSON));
+				.post(Entity.json(userObject));
 
 	}
 }

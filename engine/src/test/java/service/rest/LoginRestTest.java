@@ -3,7 +3,6 @@ package service.rest;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.plugins.providers.jackson.ResteasyJackson2Provider;
 import org.junit.Before;
@@ -34,7 +33,7 @@ public class LoginRestTest {
 
 		String uri = "http://" + host + ":" + port + "/" + projectName + "/"
 				+ rest + "/";
-		
+
 		// FIXME Use the same mapper on code, don't create other for test.
 		ResteasyJackson2Provider resteasyJacksonProvider = new ResteasyJackson2Provider();
 		ObjectMapper mapper = new ObjectMapper();
@@ -43,22 +42,23 @@ public class LoginRestTest {
 		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 		resteasyJacksonProvider.setMapper(mapper);
 		// FIXME Use the same mapper on code, don't create other for test.
-		
-		clientResource = ClientBuilder.newClient().register(resteasyJacksonProvider).target(uri);
-		
+
+		clientResource = ClientBuilder.newClient()
+				.register(resteasyJacksonProvider).target(uri);
+
 		token = this.login();
 		assert (!token.isEmpty());
 	}
 
 	private String login() throws JsonProcessingException {
-		
+
 		UserObject user = new UserObject();
 		user.setLogin("root");
 		user.setPassword("root");
-		
+
 		String token = clientResource.path("/user/login").request()
-		.post(Entity.entity(user, MediaType.APPLICATION_JSON), String.class);
-		
+				.post(Entity.json(user), String.class);
+
 		return token;
 	}
 }

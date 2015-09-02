@@ -22,7 +22,7 @@
 		class="org.jboss.resteasy.plugins.spring.SpringBeanProcessorServletAware" />
 
 	<import resource="dao.xml" />
-	<import resource="controllers.xml" />
+	<import resource="services.xml" />
 	<import resource="schedulers.xml" />
 
 	<context:annotation-config />

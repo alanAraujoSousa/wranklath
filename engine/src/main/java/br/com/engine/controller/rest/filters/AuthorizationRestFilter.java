@@ -1,4 +1,4 @@
-package br.com.engine.service.rest.filters;
+package br.com.engine.controller.rest.filters;
 
 import java.io.IOException;
 
@@ -10,7 +10,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import org.apache.log4j.Logger;
 
 import br.com.commons.enums.PermissionEnum;
-import br.com.engine.business.controller.UserController;
+import br.com.engine.business.service.UserService;
 
 @Priority(Priorities.AUTHORIZATION)
 public class AuthorizationRestFilter implements ContainerRequestFilter {
@@ -19,11 +19,11 @@ public class AuthorizationRestFilter implements ContainerRequestFilter {
 
 	private static final String TOKEN_PROPERTY = "token";
 	
-	private UserController userController;
+	private UserService userService;
 	private PermissionEnum[] permissionsRequired;
 	
-	public AuthorizationRestFilter(UserController userController, PermissionEnum[] permissionsRequired) {
-		this.userController = userController;
+	public AuthorizationRestFilter(UserService userService, PermissionEnum[] permissionsRequired) {
+		this.userService = userService;
 		this.permissionsRequired = permissionsRequired;
 	}
 	
@@ -33,6 +33,6 @@ public class AuthorizationRestFilter implements ContainerRequestFilter {
 		LOGGER.info("Authorization for: " + requestContext.getUriInfo().getPath());
 		
 		String token = requestContext.getHeaders().get(TOKEN_PROPERTY).get(0);
-		userController.authorize(permissionsRequired, token);
+		userService.authorize(permissionsRequired, token);
 	}
 }

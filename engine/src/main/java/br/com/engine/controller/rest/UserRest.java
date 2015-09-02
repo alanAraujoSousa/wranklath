@@ -1,4 +1,4 @@
-package br.com.engine.service.rest;
+package br.com.engine.controller.rest;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import br.com.commons.annotations.Authorize;
 import br.com.commons.enums.PermissionEnum;
 import br.com.commons.transport.UserObject;
-import br.com.engine.business.controller.UserController;
+import br.com.engine.business.service.UserService;
 
 @Component
 @Path("/user")
@@ -30,7 +30,7 @@ public class UserRest {
 	private static final Logger LOGGER = Logger.getLogger(UserRest.class);
 
 	@Autowired
-	private UserController userController;
+	private UserService userService;
 
 	@POST
 	@Path("/login")
@@ -38,7 +38,7 @@ public class UserRest {
 	@Produces({ MediaType.TEXT_PLAIN })
 	public Response login(final UserObject user) {
 
-		final String token = this.userController.login(user.getLogin(),
+		final String token = this.userService.login(user.getLogin(),
 				user.getPassword());
 		return Response.status(Status.OK).entity(token).build();
 	}
@@ -47,7 +47,7 @@ public class UserRest {
 	@Path("/logout")
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response logout(@HeaderParam("token") final String token) {
-		this.userController.logout(token);
+		this.userService.logout(token);
 		return Response.status(Status.OK).build();
 	}
 
@@ -56,7 +56,7 @@ public class UserRest {
 	@Path("/{userLogin}")
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response deleteUser(@HeaderParam("token") final String token, @PathParam("userLogin") String userLoginInformed) throws Exception {
-		this.userController.delete(userLoginInformed);
+		this.userService.delete(userLoginInformed);
 		return Response.status(Status.OK).build();
 	}
 
@@ -65,7 +65,7 @@ public class UserRest {
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response registerUser(final UserObject user) throws Exception {
-		UserObject createdUser = this.userController.create(user);
+		UserObject createdUser = this.userService.create(user);
 		return Response.status(Status.CREATED)
 				.entity(new GenericEntity<UserObject>(createdUser) {
 				}).build();
@@ -75,7 +75,7 @@ public class UserRest {
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response listAllUsers(@HeaderParam("token") final String token) {
-		final List<UserObject> listUserObject = this.userController
+		final List<UserObject> listUserObject = this.userService
 				.listAllUsers();
 		if (!listUserObject.isEmpty()) {
 			return Response.ok(
@@ -93,7 +93,7 @@ public class UserRest {
 
 		LOGGER.debug("verify");
 		
-		this.userController.extendTokenExpiration(token);
+		this.userService.extendTokenExpiration(token);
 		return Response.status(Status.OK).build();
 	}
 }

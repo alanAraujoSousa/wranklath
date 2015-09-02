@@ -4,25 +4,17 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 	<display-name>Untitled</display-name>
 	<context-param>
+		<param-name>javax.faces.CONFIG_FILES</param-name>
+		<param-value>/WEB-INF/faces-config.xml</param-value>
+	</context-param>
+	<context-param>
+		<param-name>primefaces.THEME</param-name>
+		<param-value>dark-hive</param-value>
+	</context-param>
+	<context-param>
 		<param-name>resteasy.servlet.mapping.prefix</param-name>
 		<param-value>/rest</param-value>
 	</context-param>
-	<filter>
-		<filter-name>CORSResquestFilter</filter-name>
-		<filter-class>br.com.engine.service.filters.CORSResponseFilter</filter-class>
-	</filter>
-	<filter>
-		<filter-name>AuthenticationFilter</filter-name>
-		<filter-class>br.com.engine.service.filters.AuthenticationFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>CORSResquestFilter</filter-name>
-		<url-pattern>/rest/*</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
-		<filter-name>AuthenticationFilter</filter-name>
-		<url-pattern>/rest/*</url-pattern>
-	</filter-mapping>
 	<listener>
 		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
 	</listener>
@@ -36,6 +28,14 @@
 		<servlet-name>resteasy-servlet</servlet-name>
 		<servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>jsf-servlet</servlet-name>
+		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>jsf-servlet</servlet-name>
+		<url-pattern>/admin/*</url-pattern>
+	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>resteasy-servlet</servlet-name>
 		<url-pattern>/rest/*</url-pattern>
