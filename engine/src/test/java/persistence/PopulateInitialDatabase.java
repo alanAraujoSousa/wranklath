@@ -1,6 +1,7 @@
 package persistence;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -17,8 +18,10 @@ import br.com.commons.transport.PermissionObject;
 import br.com.commons.transport.UserGroupObject;
 import br.com.commons.transport.UserObject;
 import br.com.commons.utils.CryptUtil;
+import br.com.engine.persistence.beans.Place;
 import br.com.engine.persistence.beans.Permission;
 import br.com.engine.persistence.beans.UserGroup;
+import br.com.engine.persistence.core.HibernateUtil;
 import br.com.engine.persistence.dao.PermissionDAO;
 import br.com.engine.persistence.dao.UserDAO;
 import br.com.engine.persistence.dao.UserGroupDAO;
@@ -40,11 +43,34 @@ public class PopulateInitialDatabase {
 	@Test
 	@Rollback(false)
 	public void populeDatabase() throws Exception {
-		saveAllPermissions();
-		List<UserGroup> allGroups = saveAllGroups();
-		saveAllUser(allGroups);
-		assignPermissionToGroups();
-		assignPermissionToUsers();
+//		+++++++++++++++++__WARNING__++++++++++++++++++ 
+//		Heavy database operation.
+		saveMap();
+//		saveAllPermissions();
+//		List<UserGroup> allGroups = saveAllGroups();
+//		saveAllUser(allGroups);
+//		assignPermissionToGroups();
+//		assignPermissionToUsers();
+	}
+
+	private void saveMap() {
+		Date startDateOfBatchProcess = new Date();
+		for (long x = 0; x < 5000; x++) {
+			System.out.println("x: " + x + " fill 5000 Y's.");
+			for (long y = 0; y < 5000; y++) {
+				Place place = new Place(x, y);
+				HibernateUtil.getInstance().currentSession().save(place);
+				if (y % 50 == 0) {
+					HibernateUtil.getInstance().currentSession().flush();
+					HibernateUtil.getInstance().currentSession().clear();
+				}
+			}
+		}
+		Date endDateOfBatchProcess = new Date();
+		System.out
+				.println("Time spent (in milliseconds) with batch processing: "
+						+ (endDateOfBatchProcess.getTime() - startDateOfBatchProcess
+								.getTime()));
 	}
 
 	private void saveAllUser(List<UserGroup> listGroups) throws Exception {

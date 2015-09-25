@@ -34,7 +34,7 @@ public class SessionCache {
 	 * @param session
 	 */
 	public void add(String token, SessionObject session) {
-		repository.put(token, session);
+		getRepository().put(token, session);
 	}
 
 	/**
@@ -44,7 +44,7 @@ public class SessionCache {
 	 * @return
 	 */
 	public SessionObject findSessionByUser(String login) {
-		Collection<SessionObject> values = repository.values();
+		Collection<SessionObject> values = getRepository().values();
 		for (SessionObject sessionObject : values) {
 			if (login.equals(sessionObject.getUser().getLogin())) {
 				return sessionObject;
@@ -60,7 +60,7 @@ public class SessionCache {
 	 * @return
 	 */
 	public SessionObject findSessionByToken(String token) {
-		SessionObject sessionObject = repository.get(token);
+		SessionObject sessionObject = getRepository().get(token);
 		return sessionObject;
 	}
 
@@ -70,17 +70,24 @@ public class SessionCache {
 	 * @param token
 	 */
 	public void removeSession(String token) {
-		repository.remove(token);
+		getRepository().remove(token);
 	}
 
 	public void cleanExpiredSessions() {
 		Date currentDate = new Date();
-		for (Iterator<Entry<String, SessionObject>> iterator = repository.entrySet()
+		for (Iterator<Entry<String, SessionObject>> iterator = getRepository().entrySet()
 				.iterator(); iterator.hasNext();) {
 			SessionObject sessionObject = iterator.next().getValue();
 			if (sessionObject.getExpirationDate().before(currentDate)) {
 				iterator.remove();
 			}
 		}
+	}
+
+	/**
+	 * @return the repository
+	 */
+	public static Map<String, SessionObject> getRepository() {
+		return repository;
 	}
 }

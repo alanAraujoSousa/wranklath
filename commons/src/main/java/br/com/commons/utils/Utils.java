@@ -11,7 +11,8 @@ public class Utils {
 	 * Convert a literal amount in bytes
 	 * 
 	 * @param value
-	 *            - A integer value + using K (Kilobytes), M (Megabytes), G (Gigabytes), T (Terabytes), P (Petabytes)
+	 *            - A integer value + using K (Kilobytes), M (Megabytes), G
+	 *            (Gigabytes), T (Terabytes), P (Petabytes)
 	 * @return The given amount in bytes
 	 */
 	public static long convertToBytes(final String value) {
@@ -19,39 +20,43 @@ public class Utils {
 
 		final boolean isBytes = value.matches("^.+?\\d$");
 		if (!isBytes && (value.length() > 1)) {
-			final Float quote = Float.valueOf(value.substring(0, value.length() - 1));
+			final Float quote = Float.valueOf(value.substring(0,
+					value.length() - 1));
 
 			final char mul = value.toLowerCase().charAt(value.length() - 1);
 			switch (mul) {
-				case 'k' : {
-					result = Float.valueOf(quote * 1024).longValue();
-				}
-					break;
+			case 'k': {
+				result = Float.valueOf(quote * 1024).longValue();
+			}
+				break;
 
-				case 'm' : {
-					result = Float.valueOf(quote * 1024 * 1024).longValue();
-				}
-					break;
+			case 'm': {
+				result = Float.valueOf(quote * 1024 * 1024).longValue();
+			}
+				break;
 
-				case 'g' : {
-					result = Float.valueOf(quote * 1024 * 1024 * 1024).longValue();
-				}
-					break;
+			case 'g': {
+				result = Float.valueOf(quote * 1024 * 1024 * 1024).longValue();
+			}
+				break;
 
-				case 't' : {
-					result = Float.valueOf(quote * 1024 * 1024 * 1024 * 1024).longValue();
-				}
-					break;
+			case 't': {
+				result = Float.valueOf(quote * 1024 * 1024 * 1024 * 1024)
+						.longValue();
+			}
+				break;
 
-				case 'p' : {
-					result = Float.valueOf(quote * 1024 * 1024 * 1024 * 1024 * 1024).longValue();
-				}
-					break;
+			case 'p': {
+				result = Float
+						.valueOf(quote * 1024 * 1024 * 1024 * 1024 * 1024)
+						.longValue();
+			}
+				break;
 
-				default : {
-					result = 0;
-				}
-					break;
+			default: {
+				result = 0;
+			}
+				break;
 			}
 		} else {
 			result = Float.valueOf(value).longValue();
@@ -74,8 +79,9 @@ public class Utils {
 		final Float giga = 1024f * 1024f * 1024f;
 		final Float tera = 1024f * 1024f * 1024f * 1024f;
 		final Float peta = 1024f * 1024f * 1024f * 1024f * 1024f;
-		final Float exab = 1024f * 1024f * 1024f * 1024f * 1024f * 1024f;;
-		
+		final Float exab = 1024f * 1024f * 1024f * 1024f * 1024f * 1024f;
+		;
+
 		final Float bytes = bytesLong.floatValue();
 
 		if (bytes == 0) {
@@ -122,7 +128,8 @@ public class Utils {
 			if (index < 0) {
 				break;
 			}
-			normalized = normalized.substring(0, index) + normalized.substring(index + 1);
+			normalized = normalized.substring(0, index)
+					+ normalized.substring(index + 1);
 		}
 
 		// Resolve occurrences of "%20" in the normalized path
@@ -131,7 +138,8 @@ public class Utils {
 			if (index < 0) {
 				break;
 			}
-			normalized = normalized.substring(0, index) + " " + normalized.substring(index + 3);
+			normalized = normalized.substring(0, index) + " "
+					+ normalized.substring(index + 3);
 		}
 
 		// Resolve occurrences of "/./" in the normalized path
@@ -140,7 +148,8 @@ public class Utils {
 			if (index < 0) {
 				break;
 			}
-			normalized = normalized.substring(0, index) + normalized.substring(index + 2);
+			normalized = normalized.substring(0, index)
+					+ normalized.substring(index + 2);
 		}
 
 		while (true) {
@@ -152,7 +161,8 @@ public class Utils {
 				return (null); // Trying to go outside our context
 			}
 			final int index2 = normalized.lastIndexOf('/', index - 1);
-			normalized = normalized.substring(0, index2) + normalized.substring(index + 3);
+			normalized = normalized.substring(0, index2)
+					+ normalized.substring(index + 3);
 		}
 
 		// Return the normalized path that we have completed
@@ -196,7 +206,7 @@ public class Utils {
 
 		return randomString;
 	}
-	
+
 	/**
 	 * Generate a random UUID
 	 * 
@@ -208,11 +218,12 @@ public class Utils {
 
 	/**
 	 * Test if a host is reachable
+	 * 
 	 * @param host
 	 * @return
 	 */
 	public static boolean isHostReachable(final String host) {
-		boolean reachable =  false;
+		boolean reachable = false;
 		try {
 			String os = System.getProperty("os.name");
 			Process p1;
@@ -220,17 +231,146 @@ public class Utils {
 				p1 = java.lang.Runtime.getRuntime().exec("ping " + host);
 			} else {
 				// 'ping -c 1' does not work on Windows
-				p1 = java.lang.Runtime.getRuntime().exec("ping -c 1 "+host);
+				p1 = java.lang.Runtime.getRuntime().exec("ping -c 1 " + host);
 			}
 			int returnVal = p1.waitFor();
-			reachable = (returnVal==0);
+			reachable = (returnVal == 0);
 		} catch (Exception e) {
 		}
-		
+
 		return reachable;
 	}
+
+	public static boolean checkProximity(Integer x, Integer y,
+			Integer targetX, Integer targetY, Integer range) {
+
+		// Get max orthogonal positions.
+		Integer xPlusExtreme = x + range;
+		Integer xMinoExtreme = x - range;
+		Integer yPlusExtreme = y + range;
+		Integer yMinoExtreme = y - range;
+
+		// Discard absurd positions.
+		if (targetX > xPlusExtreme || targetX < xMinoExtreme
+				|| targetY > yPlusExtreme || targetY < yMinoExtreme) {
+			return false;
+		}
+
+		Integer delta = 0;
+
+		if (range != 2) {
+			if (range % 3 == 0) { // divisors
+				delta = range / 3;
+			} else if ((range + 1) % 3 == 0) { // adjacents
+				delta = (range + 1) / 3;
+				delta--;
+			} else { // fails
+				delta = (range - 1) / 3;
+				delta--;
+			}
+		}
+		
+		// Quadrant 1.
+		if (targetX >= x && targetY >= y) {
+			return calcArcQuad1(x, y, targetX, targetY, xPlusExtreme,
+					yPlusExtreme, delta, range);
+		}
+		// Quadrant 2.
+		if (targetX <= x && targetY >= y) {
+			return calcArcQuad2(x, y, targetX, targetY, xMinoExtreme,
+					yPlusExtreme, delta, range);			
+		}
+		// Quadrant 3.
+		if (targetX <= x && targetY <= y) {
+			return calcArcQuad3(x, y, targetX, targetY, xMinoExtreme,
+					yMinoExtreme, delta, range);			
+		}
+		// Quadrant 4.
+		if (targetX >= x && targetY <= y) {
+			return calcArcQuad4(x, y, targetX, targetY, xPlusExtreme,
+					yMinoExtreme, delta, range);			
+		}
+
+		return false;
+	}
+
+	private static boolean calcArcQuad1(Integer x, Integer y, Integer targetX,
+			Integer targetY, Integer xPlusExtreme, Integer yPlusExtreme,
+			Integer delta, Integer visibility) {
+		int cont = visibility + delta + 1;
+		int x2 = x;
+		int y2 = yPlusExtreme;
+		for (int i = 1; i <= cont; i++) {
+			if (x2 >= targetX && y2 >= targetY) {
+				 return true;
+			}
+			if (x2 < xPlusExtreme) {
+				x2++;
+			}
+			if (i > delta) {
+				y2--;
+			}
+		}
+		return false;
+	}
 	
-	public static void main(String[] args) {
-		System.out.println(convertFromBytes(2748779069440l));
+	private static boolean calcArcQuad2(Integer x, Integer y, Integer targetX,
+			Integer targetY, Integer xMinoExtreme, Integer yPlusExtreme,
+			Integer delta, Integer visibility) {
+		int cont = visibility + delta + 1;
+		int x2 = x;
+		int y2 = yPlusExtreme;
+		for (int i = 1; i <= cont; i++) {
+			if (x2 <= targetX && y2 >= targetY) {
+				return true;
+			}
+			if (x2 > xMinoExtreme) { // warning.
+				x2--;
+			}
+			if (i > delta) {
+				y2--;
+			}
+		}
+		return false;
+	}
+	
+	private static boolean calcArcQuad3(Integer x, Integer y, Integer targetX,
+			Integer targetY, Integer xMinoExtreme, Integer yMinoExtreme,
+			Integer delta, Integer visibility) {
+		int cont = visibility + delta + 1;
+		int x2 = x;
+		int y2 = yMinoExtreme;
+		for (int i = 1; i <= cont; i++) {
+			if (x2 <= targetX && y2 <= targetY) {
+				return true;
+			}
+			if (x2 > xMinoExtreme) {
+				x2--;
+			}
+			if (i > delta) {
+				y2++;
+			}
+		}
+		return false;
+	}
+	
+	private static boolean calcArcQuad4(Integer x, Integer y, Integer targetX,
+			Integer targetY, Integer xPlusExtreme, Integer yMinoExtreme,
+			Integer delta, Integer visibility) {
+		int cont = visibility + delta + 1;
+		int x2 = x;
+		int y2 = yMinoExtreme;
+		for (int i = 1; i <= cont; i++) {
+			if (x2 >= targetX && y2 <= targetY) {
+				return true;
+			}
+			if (x2 < xPlusExtreme) {
+				x2++;
+			}
+			if (i > delta) {
+				y2++;
+			}
+		}
+		return false;
 	}
 }

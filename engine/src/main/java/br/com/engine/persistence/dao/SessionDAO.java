@@ -23,13 +23,13 @@ public class SessionDAO extends GenericDAO<Session>{
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
-	public Session findByUser(final User user) {
+	public Session findByUser(User user) {
 		return (Session) getCriteria()
 				.add(Restrictions.eq("user.id", user.getId())).list();
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
-	public Session findByToken(final String token) {
+	public Session findByToken(String token) {
 		return (Session) getCriteria()
 				.add(Restrictions.eq("token", token)).uniqueResult();
 	}

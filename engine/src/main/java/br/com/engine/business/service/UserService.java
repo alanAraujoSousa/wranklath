@@ -53,7 +53,8 @@ public class UserService {
 	public String login(String username, String password)
 			throws InvalidLoginException {
 
-		// Al
+		// Encrypt password for comparision with the password saved in the database.
+		// All passwords in the database are encrypted.
 		password = CryptUtil.getInstance().aesEncrypt(password);
 
 		User user = userDAO.find(username, password);
@@ -65,18 +66,13 @@ public class UserService {
 			SessionCache cacheProvider = SessionCache.getInstance();
 			SessionObject sessionObject = cacheProvider.findSessionByUser(user
 					.getLogin());
-			if (sessionObject != null)
+			if (sessionObject != null) // if have session in cache.
 				return sessionObject.getToken();
-
-			try {
-				Session session = this.sessionDAO.create(user); // Register on
-																// DB when user
-																// create a new
-																// session.
+			
+			try { // if not.
+				Session session = this.sessionDAO.create(user); 
 				String token = session.getToken();
-				cacheProvider.add(token, session.generateTransportObject()); // save
-																				// in
-																				// cache
+				cacheProvider.add(token, session.generateTransportObject());
 				return token;
 			} catch (final Exception e) {
 				throw new InvalidLoginException("Error on creating session: ",
