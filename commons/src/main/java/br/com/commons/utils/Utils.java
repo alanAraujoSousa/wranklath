@@ -5,7 +5,14 @@ import java.security.SecureRandom;
 import java.util.UUID;
 
 public class Utils {
+
 	private final static String THE_NUMBER_OF_THE_BEST = "666";
+	public final static int DEFAULT_MOVE_TIME = 60000; // milliseconds
+	public final static int DIAGONAL_MOVE_TIME = 90000; // milliseconds
+	public final static int COMBAT_ROUND_TIME = 30000; // milliseconds
+	public final static int ORTOGONAL_COST = 1;
+	public final static double DIAGONAL_COST = 1.5;
+	
 
 	/**
 	 * Convert a literal amount in bytes

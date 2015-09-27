@@ -1,24 +1,18 @@
 package br.com.commons.transport;
 
 import java.util.ArrayDeque;
-import java.util.Date;
 import java.util.Deque;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import br.com.commons.enums.UnitIntentEnum;
-
 
 @XmlRootElement(name = "movement")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MovementObject {
 	
-	private Date timeToNextMove;
-	private UnitIntentEnum unitIntent;
-	private Long targetId;
-	private Deque<Integer> moves;
+	private Deque<Integer> moves; // TODO change for PlaceObject's
 	private Integer actualX;
 	private Integer actualY;
 	
@@ -26,19 +20,6 @@ public class MovementObject {
 		moves = new ArrayDeque<Integer>();
 	}
 	
-	/**
-	 * @return the timeToNextMove
-	 */
-	public Date getTimeToNextMove() {
-		return timeToNextMove;
-	}
-
-	/**
-	 * @param timeToNextMove the timeToNextMove to set
-	 */
-	public void setTimeToNextMove(Date timeToNextMove) {
-		this.timeToNextMove = timeToNextMove;
-	}
 
 	/**
 	 * @return the moves
@@ -52,34 +33,6 @@ public class MovementObject {
 	 */
 	public void setMoves(Deque<Integer> moves) {
 		this.moves = moves;
-	}
-
-	/**
-	 * @return the unitIntent
-	 */
-	public UnitIntentEnum getUnitIntent() {
-		return unitIntent;
-	}
-
-	/**
-	 * @param unitIntent the unitIntent to set
-	 */
-	public void setUnitIntent(UnitIntentEnum unitIntent) {
-		this.unitIntent = unitIntent;
-	}
-
-	/**
-	 * @return the targetId
-	 */
-	public Long getTargetId() {
-		return targetId;
-	}
-
-	/**
-	 * @param targetId the targetId to set
-	 */
-	public void setTargetId(Long targetId) {
-		this.targetId = targetId;
 	}
 
 	/**
@@ -109,5 +62,4 @@ public class MovementObject {
 	public void setActualY(Integer actualY) {
 		this.actualY = actualY;
 	}
-	
 }

@@ -3,6 +3,7 @@ package br.com.engine.business.scheduler;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,14 +12,15 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.commons.enums.UnitIntentEnum;
-import br.com.commons.enums.UnitTypeEnum;
+import br.com.commons.transport.CombatObject;
 import br.com.commons.transport.MovementObject;
 import br.com.commons.transport.UnitObject;
 import br.com.commons.utils.Utils;
 import br.com.engine.persistence.beans.Building;
 import br.com.engine.persistence.beans.Place;
 import br.com.engine.persistence.beans.Unit;
-import br.com.engine.persistence.cache.EngineCache;
+import br.com.engine.persistence.cache.CombatCache;
+import br.com.engine.persistence.cache.MovementCache;
 import br.com.engine.persistence.core.HibernateUtil;
 import br.com.engine.persistence.dao.PlaceDAO;
 import br.com.engine.persistence.dao.UnitDAO;
@@ -27,12 +29,6 @@ public class MovementScheduler {
 
 	private static final Logger LOGGER = Logger
 			.getLogger(MovementScheduler.class);
-
-	public static int DEFAULT_MOVE_TIME = 60000; // milliseconds
-	public static int DIAGONAL_MOVE_TIME = 90000; // milliseconds
-	
-	public static int ORTOGONAL_COST = 1;
-	public static double DIAGONAL_COST = 1.5;
 
 	@Autowired
 	private PlaceDAO placeDAO;
@@ -47,36 +43,45 @@ public class MovementScheduler {
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public void runForestRun() {
 		int cont = 0;
-		EngineCache instance = EngineCache.getInstance();
-		for (Iterator<Entry<UnitObject, MovementObject>> iterator = instance
+		MovementCache moveCache = MovementCache.getInstance();
+		CombatCache lobbyCache = CombatCache.getInstance();
+		
+		for (Iterator<Entry<Long, UnitObject>> iterator = moveCache
 				.getRepository().entrySet().iterator(); iterator.hasNext();) {
 
-			Entry<UnitObject, MovementObject> entry = iterator.next();
+			Entry<Long, UnitObject> entry = iterator.next();
 
-			UnitObject unit = entry.getKey();
-			MovementObject move = entry.getValue();
+			UnitObject unit = entry.getValue();
+			
+			// Unit is in combat.
+			if (unit.getCombatId() != null &&  !unit.getCombatId().isEmpty()) {
+				lobbyCache.getLobby(unit.getCombatId());
+			}
 
-			// stop process if move list is empty.
-			if (move.getMoves().isEmpty())
+			// Unit is stopped.
+			if (unit.getMovementObject().getMoves().isEmpty())
 				continue;
 
 			// Execute next moviment.
-			boolean isNextMoveValid = execMovement(unit, move); 
+			boolean isNextMoveValid = execMovement(unit);
 			if (!isNextMoveValid)
-				move.getMoves().clear();
+				unit.getMovementObject().getMoves().clear();
 
 			cont++;
 
-			// To execute batch processing
-			if (cont % 10 == 0) { // TODO Validate consistence.
+			// TODO Validate consistence.
+			// Execute batch processing.
+			if (cont % 10 == 0) {
 				HibernateUtil.getInstance().currentSession().flush();
 				HibernateUtil.getInstance().currentSession().clear();
 			}
 		}
 	}
 
-	public boolean execMovement(UnitObject unitObject, MovementObject move) {
-		Date timeToNextMove = move.getTimeToNextMove();
+	public boolean execMovement(UnitObject unitObject) {
+
+		MovementObject unitMovement = unitObject.getMovementObject();
+		Date timeToNextMove = unitObject.getTimeToNextMove();
 		Date now = new Date();
 
 		if (timeToNextMove.compareTo(now) <= 0) { // it's time to move
@@ -84,26 +89,32 @@ public class MovementScheduler {
 
 			// Get error margin.
 			Integer diff = (int) (timeToNextMove.getTime() - now.getTime());
-			
-			MovementObject enemyMove = null;
+			if (diff != 0) {
+				LOGGER.debug("Error margin: " + diff + " on movement of: "
+						+ unitObject.getId() + ", time: " + now);
+			}
+
+			UnitObject enemy = null;
 
 			// if my intent is attack other
 			// test attack
-			if (move.getUnitIntent().equals(UnitIntentEnum.ATTACK)) { // ATTAAAAACK
+			if (unitObject.getUnitIntent().equals(UnitIntentEnum.ATTACK)) { // ATTAAAAACK
 
 				// Get my target Id
-				Long enemyId = move.getTargetId();
+				Long enemyId = unitObject.getTargetId();
 
 				// Enemy actual position
-				enemyMove = EngineCache.getInstance().findMovementByUnitId(
-						enemyId);
+				enemy = MovementCache.getInstance().findUnitById(enemyId);
 
-				move = execAttack(unitObject, move, enemyMove);
+				boolean attackOccurred = execAttack(unitObject, enemy);
+				if (attackOccurred) {
+					return false;
+				}
 			}
 
 			// Get "place" by coordinates.
-			Integer x = move.getMoves().pollFirst();
-			Integer y = move.getMoves().pollFirst();
+			Integer x = unitMovement.getMoves().pollFirst();
+			Integer y = unitMovement.getMoves().pollFirst();
 
 			Place place = placeDAO.findByCoordinates(x, y);
 
@@ -118,22 +129,22 @@ public class MovementScheduler {
 			if (unit != null) {
 				return false;
 			}
-			
+
 			// Calc time to next move.
 			Integer moveBuff = place.getType().getMoveBuff();
-			Integer moveTime = DEFAULT_MOVE_TIME;
+			Integer moveTime = Utils.DEFAULT_MOVE_TIME;
 
 			// diagonal moviment
-			if (x != move.getActualX() && y != move.getActualY()) {
-				moveTime = DIAGONAL_MOVE_TIME;
+			if (x != unitMovement.getActualX()
+					&& y != unitMovement.getActualY()) {
+				moveTime = Utils.DIAGONAL_MOVE_TIME;
 			}
 
 			moveTime -= (moveTime * unitObject.getType().getVelocity()) / 100;
 			moveTime -= (moveTime * moveBuff) / 100;
-			moveTime -= diff; 
-			
-			timeToNextMove = new Date(now.getTime() + moveTime);
-			move.setTimeToNextMove(timeToNextMove);
+
+			timeToNextMove.setTime(timeToNextMove.getTime() + moveTime);
+			unitObject.setTimeToNextMove(timeToNextMove);
 
 			// Run movement.
 			Unit myUnit = this.unitDAO.findById(unitObject.getId());
@@ -141,26 +152,32 @@ public class MovementScheduler {
 
 			// Edit actual position in cache.
 			// TODO Only edit cache after flush and clean session.
-			move.setActualX(x);
-			move.setActualX(y);
+			unitMovement.setActualX(x);
+			unitMovement.setActualX(y);
 
 			// Test ATTACK again :)
-			if (move.getUnitIntent().equals(UnitIntentEnum.ATTACK)) {
-				move = execAttack(unitObject, move, enemyMove);
+			if (unitObject.getUnitIntent().equals(UnitIntentEnum.ATTACK)) {
+				boolean attackOccurred = execAttack(unitObject, enemy);
+				if (attackOccurred) {
+					return false;
+				}
 			}
 		}
 		return true;
 	}
 
-	private MovementObject execAttack(UnitObject unitObject,
-			MovementObject move, MovementObject enemyMove) {
+	private boolean execAttack(UnitObject unitObject, UnitObject enemy) {
 
-		Integer enemyActualX = enemyMove.getActualX();
-		Integer enemyActualY = enemyMove.getActualY();
+		MovementObject enemyMovement = enemy.getMovementObject();
+		MovementObject unitMovement = unitObject.getMovementObject();
+
+		// Enemy actual position
+		Integer enemyActualX = enemyMovement.getActualX();
+		Integer enemyActualY = enemyMovement.getActualY();
 
 		// My actual position
-		Integer actualX = move.getActualX();
-		Integer actualY = move.getActualY();
+		Integer actualX = unitMovement.getActualX();
+		Integer actualY = unitMovement.getActualY();
 
 		// My attack range
 		Integer atkRange = unitObject.getType().getAtkRange();
@@ -171,9 +188,46 @@ public class MovementScheduler {
 
 		if (isReachable) {
 
-			// TODO Implement Combate.
-			// Cache of combate, separate in another cache.
+			// Verify if my enemy is already in lobby of combat.
+			String combatId = enemy.getCombatId();
+			if (combatId != null && !combatId.isEmpty()) {
+				CombatObject lobby = CombatCache.getInstance().getLobby(
+						combatId);
+				if (lobby == null) {
+					// TODO treat inconsistence.
+					LOGGER.debug("Detected inconsistence, army: "
+							+ unitObject.getId() + ", on lobby: " + combatId);
+				} else {
+					// Register on correct lobby, the inverse lobby of my enemy.
+					if (combatId.endsWith("a")) {
+						lobby.getSideB().add(unitObject); // put in lobby
+															// "b"
+					} else {
+						lobby.getSideA().add(unitObject); // put in lobby
+															// "a"
+					}
+				}
+			} else { // My enemy is "de boas".
 
+				// Create Combat Lobby
+				UUID combatUUID = UUID.randomUUID();
+				CombatObject combatObject = new CombatObject();
+				combatObject.getSideA().add(unitObject);
+				combatObject.getSideB().add(enemy);
+				Date now = new Date();
+				combatObject.setStartTime(now);
+				CombatCache.getInstance().add(combatUUID, combatObject);
+
+				// Save reference of combat in army's
+				unitObject.setCombatId(combatUUID.toString() + "a");
+				enemy.setCombatId(combatUUID.toString() + "b");
+
+			}
+			
+			Date timeToNextMove = unitObject.getTimeToNextMove();
+			timeToNextMove.setTime(timeToNextMove.getTime() + Utils.COMBAT_ROUND_TIME);
+
+			return true;
 		} else {
 			// My visibility range
 			Integer visibilityRange = unitObject.getType().getVisibility();
@@ -185,15 +239,14 @@ public class MovementScheduler {
 			// If the enemy is visible.
 			if (isVisible) {
 
-				// TODO Recalculate to the best move to the target.
+				// TODO Recalculate the route for the best to the target.
 
 				// If the enemy is moving.
-				if (!enemyMove.getMoves().isEmpty()) {
+				if (!enemyMovement.getMoves().isEmpty()) {
 					// TODO Give some buff to pursuit. :)
 				}
 			}
+			return false;
 		}
-
-		return move;
 	}
 }

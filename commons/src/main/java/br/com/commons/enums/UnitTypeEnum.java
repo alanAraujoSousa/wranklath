@@ -1,9 +1,9 @@
 package br.com.commons.enums;
 
 public enum UnitTypeEnum {
-	CAVALARY(422322, "cavalary", 10, 4, 3, -10, 1, 3),
-	INFANTRY(392333, "infantry", 10, 4, 3, -30, 1, 3),
-	ARCHER(202356, "archer", 8, 3, 1, -30, 3, 5),
+	CAVALARY(422322, "cavalary", 10, 4, 3, 30, 1, 3),
+	INFANTRY(392333, "infantry", 10, 4, 3, 10, 1, 3),
+	ARCHER(202356, "archer", 8, 3, 1, 10, 3, 5),
 	;
 	
 	private Integer id;
