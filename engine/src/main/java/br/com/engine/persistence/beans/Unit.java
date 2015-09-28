@@ -38,9 +38,6 @@ public class Unit implements Serializable, TransportObjectInterface{
 	@Column(name = "type")
 	private Integer type;
 
-	@Column(name = "visibility")
-	private Integer visibility;
-	
 	@Column(name = "quantity")
 	private Integer quantity;
 
@@ -107,20 +104,6 @@ public class Unit implements Serializable, TransportObjectInterface{
 	 */
 	public void setPlace(Place place) {
 		this.place = place;
-	}
-
-	/**
-	 * @return the visibility
-	 */
-	public Integer getVisibility() {
-		return visibility;
-	}
-
-	/**
-	 * @param visibility the visibility to set
-	 */
-	public void setVisibility(Integer visibility) {
-		this.visibility = visibility;
 	}
 
 	/**

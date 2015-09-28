@@ -19,6 +19,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import br.com.commons.enums.PlaceTypeEnum;
+import br.com.commons.transport.PlaceObject;
 import br.com.commons.transport.interfaces.TransportObjectInterface;
 
 @Entity
@@ -33,10 +34,10 @@ public class Place implements Serializable, TransportObjectInterface{
 	private Long id;
 	
 	@Column(name = "x")
-	private Long x;
+	private Integer x;
 	
 	@Column(name = "y")
-	private Long y;
+	private Integer y;
 
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "building_id")
@@ -52,16 +53,20 @@ public class Place implements Serializable, TransportObjectInterface{
 	public Place() {
 	}
 	
-	public Place(Long x, Long y) {
+	public Place(Integer x, Integer y) {
 		this();
 		this.x = x;
 		this.y = y;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T generateTransportObject() {
-		// TODO Auto-generated method stub
-		return null;
+	public PlaceObject generateTransportObject() {
+		PlaceObject placeObject = new PlaceObject();
+		placeObject.setX(getX());
+		placeObject.setY(getY());
+		placeObject.setType(getType());
+		return placeObject;
 	}
 
 	/**
@@ -92,34 +97,6 @@ public class Place implements Serializable, TransportObjectInterface{
 		this.building = building;
 	}
 
-	/**
-	 * @return the x
-	 */
-	public Long getX() {
-		return x;
-	}
-
-	/**
-	 * @param x the x to set
-	 */
-	public void setX(Long x) {
-		this.x = x;
-	}
-
-	/**
-	 * @return the y
-	 */
-	public Long getY() {
-		return y;
-	}
-
-	/**
-	 * @param y the y to set
-	 */
-	public void setY(Long y) {
-		this.y = y;
-	}
-	
 	/**
 	 * @return the type
 	 */
@@ -155,5 +132,33 @@ public class Place implements Serializable, TransportObjectInterface{
 	 */
 	public void setType(Integer type) {
 		this.type = type;
+	}
+
+	/**
+	 * @return the x
+	 */
+	public Integer getX() {
+		return x;
+	}
+
+	/**
+	 * @param x the x to set
+	 */
+	public void setX(Integer x) {
+		this.x = x;
+	}
+
+	/**
+	 * @return the y
+	 */
+	public Integer getY() {
+		return y;
+	}
+
+	/**
+	 * @param y the y to set
+	 */
+	public void setY(Integer y) {
+		this.y = y;
 	}
 }

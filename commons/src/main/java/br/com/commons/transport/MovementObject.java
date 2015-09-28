@@ -13,8 +13,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class MovementObject {
 	
 	private Deque<Integer> moves; // TODO change for PlaceObject's
-	private Integer actualX;
-	private Integer actualY;
 	
 	public MovementObject() {
 		moves = new ArrayDeque<Integer>();
@@ -35,31 +33,4 @@ public class MovementObject {
 		this.moves = moves;
 	}
 
-	/**
-	 * @return the actualX
-	 */
-	public Integer getActualX() {
-		return actualX;
-	}
-
-	/**
-	 * @param actualX the actualX to set
-	 */
-	public void setActualX(Integer actualX) {
-		this.actualX = actualX;
-	}
-
-	/**
-	 * @return the actualY
-	 */
-	public Integer getActualY() {
-		return actualY;
-	}
-
-	/**
-	 * @param actualY the actualY to set
-	 */
-	public void setActualY(Integer actualY) {
-		this.actualY = actualY;
-	}
 }

@@ -55,9 +55,9 @@ public class PopulateInitialDatabase {
 
 	private void saveMap() {
 		Date startDateOfBatchProcess = new Date();
-		for (long x = 0; x < 5000; x++) {
+		for (int x = 0; x < 5000; x++) {
 			System.out.println("x: " + x + " fill 5000 Y's.");
-			for (long y = 0; y < 5000; y++) {
+			for (int y = 0; y < 5000; y++) {
 				Place place = new Place(x, y);
 				HibernateUtil.getInstance().currentSession().save(place);
 				if (y % 50 == 0) {

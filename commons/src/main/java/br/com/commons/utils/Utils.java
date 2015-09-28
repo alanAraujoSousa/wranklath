@@ -4,6 +4,9 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.UUID;
 
+import br.com.commons.enums.PlaceTypeEnum;
+import br.com.commons.enums.UnitTypeEnum;
+
 public class Utils {
 
 	private final static String THE_NUMBER_OF_THE_BEST = "666";
@@ -379,5 +382,33 @@ public class Utils {
 			}
 		}
 		return false;
+	}
+
+	public static Integer calcMoveBuff(UnitTypeEnum type, PlaceTypeEnum type2) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public static Integer calcAttackBuff(UnitTypeEnum unit, UnitTypeEnum enemy,
+			PlaceTypeEnum place) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public static Integer calcDamage(Integer atkPower, Integer unitQtd,
+			Integer atkBuff) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Integer calcTotalLife(Integer life, Integer enemyQtd,
+			Integer armour) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Integer calcTotalLife(Integer life, Integer armour) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

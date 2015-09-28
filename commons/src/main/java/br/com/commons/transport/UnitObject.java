@@ -19,6 +19,7 @@ public class UnitObject {
 	private String combatId;
 	private Integer type;
 	private Integer unitIntent;
+	private Integer quantity;
 	private Date timeToNextMove;
 	private MovementObject movementObject;
 	private PlaceObject place;
@@ -171,5 +172,19 @@ public class UnitObject {
 	 */
 	public void setCombatId(String combatId) {
 		this.combatId = combatId;
+	}
+
+	/**
+	 * @return the quantity
+	 */
+	public Integer getQuantity() {
+		return quantity;
+	}
+
+	/**
+	 * @param quantity the quantity to set
+	 */
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
 	}
 }
