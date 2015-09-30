@@ -47,13 +47,13 @@ public class UserDAO extends GenericDAO<User> {
 	
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public void destroy(User user) {
-		delete(user);
+		super.delete(user);
 	}	
 	
 	
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public void setPermissions(User user, Set<Permission> listPermission) {
 		user.setPermissions(listPermission);
-		this.update(user);
+		super.update(user);
 	}
 }

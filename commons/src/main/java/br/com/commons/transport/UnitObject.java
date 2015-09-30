@@ -15,16 +15,16 @@ import br.com.commons.enums.UnitTypeEnum;
 public class UnitObject {
 	
 	private Long id;
-	private Long targetId;
-	private String combatId;
 	private Integer type;
 	private Integer unitIntent;
 	private Integer quantity;
 	private Date timeToNextMove;
 	private MovementObject movementObject;
+	private CombatObject combatObject;
 	private PlaceObject place;
 	
-	
+	// FIXME to remove
+	private Long targetId;
 
 	/**
 	 * @return the unitIntent
@@ -161,20 +161,6 @@ public class UnitObject {
 	}
 
 	/**
-	 * @return the combatId
-	 */
-	public String getCombatId() {
-		return combatId;
-	}
-
-	/**
-	 * @param combatId the combatId to set
-	 */
-	public void setCombatId(String combatId) {
-		this.combatId = combatId;
-	}
-
-	/**
 	 * @return the quantity
 	 */
 	public Integer getQuantity() {
@@ -186,5 +172,19 @@ public class UnitObject {
 	 */
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
+	}
+
+	/**
+	 * @return the combatObject
+	 */
+	public CombatObject getCombatObject() {
+		return combatObject;
+	}
+
+	/**
+	 * @param combatObject the combatObject to set
+	 */
+	public void setCombatObject(CombatObject combatObject) {
+		this.combatObject = combatObject;
 	}
 }

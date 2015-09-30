@@ -17,4 +17,5 @@
 	
 	<bean id="sessionScheduler" class="br.com.engine.business.scheduler.SessionScheduler" autowire="byType"/>
 	<bean id="movementScheduler" class="br.com.engine.business.scheduler.MovementScheduler" autowire="byType"/>
+	<bean id="combatScheduler" class="br.com.engine.business.scheduler.CombatScheduler" autowire="byType"/>
 </beans>

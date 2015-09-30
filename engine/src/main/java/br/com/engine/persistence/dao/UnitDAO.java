@@ -21,4 +21,14 @@ public class UnitDAO extends GenericDAO<Unit> {
 		unit.setPlace(place);
 		this.update(unit);
 	}
+	
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public void delete(Unit unit) {
+		super.delete(unit);
+	}
+
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public void update(Unit unit) {
+		super.update(unit);
+	}
 }

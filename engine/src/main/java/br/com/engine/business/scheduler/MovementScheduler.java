@@ -3,7 +3,6 @@ package br.com.engine.business.scheduler;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -15,14 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.commons.enums.UnitIntentEnum;
 import br.com.commons.transport.CombatObject;
 import br.com.commons.transport.MovementObject;
-import br.com.commons.transport.PlaceObject;
 import br.com.commons.transport.UnitObject;
 import br.com.commons.utils.Utils;
 import br.com.engine.persistence.beans.Building;
 import br.com.engine.persistence.beans.Place;
 import br.com.engine.persistence.beans.Unit;
 import br.com.engine.persistence.cache.CombatCache;
-import br.com.engine.persistence.cache.MovementCache;
+import br.com.engine.persistence.cache.UnitCache;
 import br.com.engine.persistence.core.HibernateUtil;
 import br.com.engine.persistence.dao.PlaceDAO;
 import br.com.engine.persistence.dao.UnitDAO;
@@ -45,11 +43,9 @@ public class MovementScheduler {
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public void runForestRun() {
 		int cont = 0;
-		MovementCache moveCache = MovementCache.getInstance();
-		CombatCache lobbyCache = CombatCache.getInstance();
-
+		UnitCache moveCache = UnitCache.getInstance();
 		for (Iterator<Entry<Long, UnitObject>> iterator = moveCache
-				.getRepository().entrySet().iterator(); iterator.hasNext();) {
+				.getMoveRepository().entrySet().iterator(); iterator.hasNext();) {
 
 			Entry<Long, UnitObject> entry = iterator.next();
 			UnitObject unit = entry.getValue();
@@ -57,63 +53,12 @@ public class MovementScheduler {
 			// if is correct time.
 			Date now = new Date();
 			Date timeToNextMove = unit.getTimeToNextMove();
+			
+			// FIXME Units in combate don't have place in moviment cache !
+			if (unit.getCombatObject() != null) {
+				continue;
+			}
 			if (timeToNextMove.compareTo(now) <= 0 || timeToNextMove == null) {
-
-				// Unit is in combat.
-				if (unit.getCombatId() != null && !unit.getCombatId().isEmpty()) {
-
-					CombatObject lobby = lobbyCache
-							.getLobby(unit.getCombatId());
-
-					Long targetId = unit.getTargetId();
-
-					// Verify if my enemy is in my lobby.
-					UnitObject enemy = null;
-					Set<UnitObject> side;
-					if (unit.getCombatId().endsWith("a")) {
-						side = lobby.getSideB();
-					} else {
-						side = lobby.getSideA();
-					}
-					for (UnitObject unitObject : side) {
-						if (unitObject.getId() == targetId) {
-							enemy = unitObject;
-							break;
-						}
-					}
-
-					if (enemy == null) {
-						enemy = moveCache.findUnitById(targetId);
-						if (enemy == null) { // He died \o/.
-
-						} else { // Register-me or create lobby with my enemy.
-							execAttack(unit, enemy);
-						}
-					} else { // Fire attack motherfucker
-						Integer unitQtd = unit.getQuantity();
-						Integer atkPower = unit.getType().getAttack();
-						PlaceObject place = unit.getPlace();
-
-						Integer atkBuff = Utils.calcAttackBuff(unit.getType(),
-								enemy.getType(), place.getType());
-						
-						atkPower = Utils.calcDamage(atkPower, unitQtd, atkBuff);
-						
-						Integer enemyQtd = enemy.getQuantity(); 
-						Integer life = enemy.getType().getLife();
-						Integer armour = enemy.getType().getArmour();
-						
-						// FIXME Work with Double
-						Integer ratio = Utils.calcTotalLife(life, armour); 
-						life = ratio * enemyQtd;
-						life -= atkPower;
-						if (life <= 0) {
-							// The enemy has defeat \o/
-						}
-						enemyQtd = life / ratio;
-						// reduzir a quantidade depois dessa rodada
-					}
-				}
 
 				// If my intent is attack other
 				UnitObject enemy = null;
@@ -123,11 +68,11 @@ public class MovementScheduler {
 					Long enemyId = unit.getTargetId();
 
 					// Enemy actual position
-					enemy = MovementCache.getInstance().findUnitById(enemyId);
+					enemy = UnitCache.getInstance().findUnitByIdOnMove(enemyId);
 
 					boolean attackOccurred = execAttack(unit, enemy);
 					if (attackOccurred) {
-						// não executa movimentos.
+						continue;
 					}
 				}
 
@@ -139,10 +84,7 @@ public class MovementScheduler {
 
 					// Test ATTACK again :)
 					if (unit.getUnitIntent().equals(UnitIntentEnum.ATTACK)) {
-						boolean attackOccurred = execAttack(unit, enemy);
-						if (attackOccurred) {
-							// return false;
-						}
+						execAttack(unit, enemy);
 					}
 				}
 
@@ -244,23 +186,16 @@ public class MovementScheduler {
 
 			// Verify if my enemy is already in lobby of combat.
 			// Register on "Friend of enemies of my enemy." (:
-			String combatId = enemy.getCombatId();
-			if (combatId != null && !combatId.isEmpty()) {
-				CombatObject lobby = CombatCache.getInstance().getLobby(
-						combatId);
-				if (lobby == null) {
-					// TODO treat inconsistence.
-					LOGGER.error("Detected inconsistence, army: "
-							+ unitObject.getId() + ", on lobby: " + combatId);
+			CombatObject enemyCombatObject = enemy.getCombatObject();
+			if (enemyCombatObject != null) {
+				// Register on correct lobby, the inverse lobby of my enemy.
+				// this is a little confused
+				if (enemyCombatObject.getSideA().contains(enemy)) {
+					// put in lobby "b"
+					enemyCombatObject.getSideB().add(unitObject);
 				} else {
-					// Register on correct lobby, the inverse lobby of my enemy.
-					if (combatId.endsWith("a")) {
-						lobby.getSideB().add(unitObject); // put in lobby
-															// "b"
-					} else {
-						lobby.getSideA().add(unitObject); // put in lobby
-															// "a"
-					}
+					// put in lobby "a"
+					enemyCombatObject.getSideA().add(unitObject);
 				}
 			} else { // My enemy is "de boas".
 
@@ -274,19 +209,23 @@ public class MovementScheduler {
 				CombatCache.getInstance().add(combatUUID, combatObject);
 
 				// Save reference of combat in army's.
-				unitObject.setCombatId(combatUUID.toString() + "a");
-				enemy.setCombatId(combatUUID.toString() + "b");
+				unitObject.setCombatObject(combatObject);
+				enemy.setCombatObject(combatObject);
 
+				
+				// FIXME only give this power after receive the concret attack.
 				// If the enemy is stopped.
 				if (!enemyMovement.getMoves().isEmpty()) {
 					// Let my enemy attack as well.
 					enemy.getTimeToNextMove().setTime(timeToNextAttack);
 				}
+				UnitCache.getInstance().addToCombats(enemy);
+				// FIXME only give this power after receive the concret attack.
 			}
+			UnitCache.getInstance().addToCombats(unitObject);
 
 			// My time to attack.
 			unitObject.getTimeToNextMove().setTime(timeToNextAttack);
-
 			return true;
 		} else { // Is not close to attack. >> PURSUIT >> .\ /.
 
@@ -307,8 +246,7 @@ public class MovementScheduler {
 					// TODO Give some buff to pursuit. :)
 				}
 			} else {
-				unitObject.setCombatId(null);
-
+				unitObject.setCombatObject(null);
 			}
 			return false;
 		}
