@@ -48,7 +48,7 @@ public class UserRest {
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response logout(@HeaderParam("token") final String token) {
 		this.userService.logout(token);
-		return Response.status(Status.OK).build();
+		return Response.ok().build();
 	}
 
 	@Authorize({ PermissionEnum.DELETE_USER })
@@ -57,7 +57,7 @@ public class UserRest {
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response deleteUser(@HeaderParam("token") final String token, @PathParam("userLogin") String userLoginInformed) throws Exception {
 		this.userService.delete(userLoginInformed);
-		return Response.status(Status.OK).build();
+		return Response.ok().build();
 	}
 
 	@Authorize({ PermissionEnum.CREATE_USER })
@@ -94,6 +94,6 @@ public class UserRest {
 		LOGGER.debug("verify");
 		
 		this.userService.extendTokenExpiration(token);
-		return Response.status(Status.OK).build();
+		return Response.ok().build();
 	}
 }
