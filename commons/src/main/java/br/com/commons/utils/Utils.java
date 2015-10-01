@@ -384,30 +384,27 @@ public class Utils {
 		return false;
 	}
 
+	// Returns percents
 	public static Integer calcMoveBuff(UnitTypeEnum type, PlaceTypeEnum type2) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
+	
+	// Returns percents
 	public static Integer calcAttackBuff(UnitTypeEnum unit, UnitTypeEnum enemy,
 			PlaceTypeEnum place) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	public static Integer calcAttackPower(Integer atkPower, Integer unitQtd,
+	public static Integer calcAttackPowerPerUnit(Integer atkPower, Integer unitQtd,
 			Integer atkBuff) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public static Integer calcTotalLife(Integer life, Integer enemyQtd,
-			Integer armour) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static Integer calcTotalLife(Integer life, Integer armour) {
+	public static Integer calcTotalLifePerUnit(Integer life, Integer armour) {
 		// TODO Auto-generated method stub
 		return null;
 	}

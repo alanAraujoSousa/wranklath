@@ -109,6 +109,20 @@ public class Building implements Serializable, TransportObjectInterface{
 		this.place = place;
 	}
 
+	/**
+	 * @return the conclusionDate
+	 */
+	public Date getConclusionDate() {
+		return conclusionDate;
+	}
+
+	/**
+	 * @param conclusionDate the conclusionDate to set
+	 */
+	public void setConclusionDate(Date conclusionDate) {
+		this.conclusionDate = conclusionDate;
+	}
+
 	
 	
 }

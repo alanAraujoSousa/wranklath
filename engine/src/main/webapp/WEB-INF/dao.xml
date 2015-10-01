@@ -99,5 +99,6 @@
 		autowire="byType" />
 	<bean id="unitDAO" class="br.com.engine.persistence.dao.UnitDAO"
 		autowire="byType" />
-
+	<bean id="buildingDAO" class="br.com.engine.persistence.dao.BuildingDAO"
+		autowire="byType" />
 </beans>

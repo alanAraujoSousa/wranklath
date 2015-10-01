@@ -102,9 +102,8 @@ public class CombatScheduler {
 				Integer atkBuff = Utils.calcAttackBuff(unit.getType(),
 						enemy.getType(), place.getType());
 
-				atkPower = Utils.calcAttackPower(atkPower, unitQtd, atkBuff);
-
-				life = Utils.calcTotalLife(life, armour);
+				atkPower = Utils.calcAttackPowerPerUnit(atkPower, unitQtd, atkBuff);
+				life = Utils.calcTotalLifePerUnit(life, armour);
 
 				Integer totalLife = life * enemyQtd;
 				totalLife -= atkPower;
@@ -126,7 +125,7 @@ public class CombatScheduler {
 						UnitCache.getInstance().removeFromMove(enemy.getId());
 						continue;
 					} else {
-						unit.setQuantity(enemyQtd);
+						enemy.setQuantity(enemyQtd);
 						this.unitDAO.update(enemyDB);
 					}
 				}
