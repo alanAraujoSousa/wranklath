@@ -395,7 +395,7 @@ public class Utils {
 		return 0;
 	}
 
-	public static Integer calcDamage(Integer atkPower, Integer unitQtd,
+	public static Integer calcAttackPower(Integer atkPower, Integer unitQtd,
 			Integer atkBuff) {
 		// TODO Auto-generated method stub
 		return null;

@@ -19,7 +19,6 @@ import br.com.commons.utils.Utils;
 import br.com.engine.persistence.beans.Building;
 import br.com.engine.persistence.beans.Place;
 import br.com.engine.persistence.beans.Unit;
-import br.com.engine.persistence.cache.CombatCache;
 import br.com.engine.persistence.cache.UnitCache;
 import br.com.engine.persistence.core.HibernateUtil;
 import br.com.engine.persistence.dao.PlaceDAO;
@@ -42,22 +41,23 @@ public class MovementScheduler {
 	@Scheduled(fixedDelay = 1000 * 1)
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public void runForestRun() {
-		int cont = 0;
-		UnitCache moveCache = UnitCache.getInstance();
-		for (Iterator<Entry<Long, UnitObject>> iterator = moveCache
+		short cont = 0; // :s
+		UnitCache unitCache = UnitCache.getInstance();
+		for (Iterator<Entry<Long, UnitObject>> iterator = unitCache
 				.getMoveRepository().entrySet().iterator(); iterator.hasNext();) {
 
 			Entry<Long, UnitObject> entry = iterator.next();
 			UnitObject unit = entry.getValue();
 
-			// if is correct time.
-			Date now = new Date();
-			Date timeToNextMove = unit.getTimeToNextMove();
-			
 			// FIXME Units in combate don't have place in moviment cache !
 			if (unit.getCombatObject() != null) {
 				continue;
 			}
+
+			// if is correct time.
+			Date now = new Date();
+			Date timeToNextMove = unit.getTimeToNextMove();
+			
 			if (timeToNextMove.compareTo(now) <= 0 || timeToNextMove == null) {
 
 				// If my intent is attack other
@@ -204,14 +204,12 @@ public class MovementScheduler {
 				CombatObject combatObject = new CombatObject();
 				combatObject.getSideA().add(unitObject);
 				combatObject.getSideB().add(enemy);
-				Date now = new Date();
-				combatObject.setStartTime(now);
-				CombatCache.getInstance().add(combatUUID, combatObject);
-
+				combatObject.setStartTime(new Date());
+				combatObject.setCombatId(combatUUID.toString());
+				
 				// Save reference of combat in army's.
 				unitObject.setCombatObject(combatObject);
 				enemy.setCombatObject(combatObject);
-
 				
 				// FIXME only give this power after receive the concret attack.
 				// If the enemy is stopped.
@@ -224,8 +222,9 @@ public class MovementScheduler {
 			}
 			UnitCache.getInstance().addToCombats(unitObject);
 
-			// My time to attack.
+			// My time to attack.O
 			unitObject.getTimeToNextMove().setTime(timeToNextAttack);
+			
 			return true;
 		} else { // Is not close to attack. >> PURSUIT >> .\ /.
 
@@ -248,6 +247,7 @@ public class MovementScheduler {
 			} else {
 				unitObject.setCombatObject(null);
 			}
+			
 			return false;
 		}
 	}

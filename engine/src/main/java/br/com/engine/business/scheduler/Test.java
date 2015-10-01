@@ -1,11 +1,15 @@
 package br.com.engine.business.scheduler;
 
-import java.util.HashMap;
+import br.com.commons.transport.UnitObject;
 
 public class Test {
 	public static void main(String[] args) {
-		Integer i = 3;
-		Integer j = 2;
-		System.out.println(i/j);
+		UnitObject u = new UnitObject();
+		u.setQuantity(3);
+		
+		Integer quantity = u.getQuantity();
+		quantity = 4;
+		
+		System.out.println(u.getQuantity());
 	}
 }
