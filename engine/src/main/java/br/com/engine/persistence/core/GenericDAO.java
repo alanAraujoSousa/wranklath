@@ -19,12 +19,12 @@ public abstract class GenericDAO<T> {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-	protected void save(T entity) throws Exception {
+	protected void save(T entity) {
 		hibernateUtil.currentSession().saveOrUpdate(entity);
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-	protected void delete(T entity) throws Exception {
+	protected void delete(T entity) {
 		hibernateUtil.currentSession().delete(entity);
 	}
 

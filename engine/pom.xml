@@ -34,6 +34,13 @@
 			<version>${MYSQL_VERSION}</version>
 		</dependency>
 
+		<!-- c3p0 -->
+		<dependency>
+			<groupId>com.mchange</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.5</version>
+		</dependency>
+
 		<!-- Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -156,10 +163,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Some Http Client -->
-
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>

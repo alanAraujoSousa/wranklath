@@ -18,7 +18,7 @@ public class PermissionDAO extends GenericDAO<Permission> {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-	public Permission create(final PermissionObject permissionObject) throws Exception {
+	public Permission create(PermissionObject permissionObject) throws Exception {
 		Permission permission = new Permission();
 		permission.setPermission(permissionObject.getPermission());
 		save(permission);

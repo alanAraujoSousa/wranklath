@@ -10,30 +10,27 @@
 	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
+	<!-- Properties reader -->
 	<bean id="propertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="location" value="classpath:jdbc.properties" />
 	</bean>
 
-	<!-- DataSource Definition -->
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+	<!-- DataSource definition -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
-		<property name="driverClassName" value="${jdbc.driver_class}" />
-		<property name="url" value="${jdbc.url}" />
-		<property name="username" value="${jdbc.username}" />
+		<property name="driverClass" value="${jdbc.driver_class}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
-		<property name="maxActive" value="90" />
-		<property name="testOnBorrow" value="true" />
-		<property name="validationQuery" value="SELECT 1" />
+
+		<!-- these are C3P0 properties -->
+		<property name="maxPoolSize" value="50" />
+		<property name="minPoolSize" value="10" />
+		<property name="maxStatements" value="100" />
 	</bean>
 
-	<bean id="transactionManager"
-		class="org.springframework.orm.hibernate4.HibernateTransactionManager"
-		p:sessionFactory-ref="sessionFactory">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-
-	<!-- Session factory -->
+	<!-- Session factory configuration -->
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
 
@@ -43,6 +40,9 @@
 				<value>br.com.engine.persistence.beans.UserGroup</value>
 				<value>br.com.engine.persistence.beans.Permission</value>
 				<value>br.com.engine.persistence.beans.Session</value>
+				<value>br.com.engine.persistence.beans.Place</value>
+				<value>br.com.engine.persistence.beans.Building</value>
+				<value>br.com.engine.persistence.beans.Unit</value>
 			</list>
 		</property>
 
@@ -53,11 +53,17 @@
 				<prop key="hibernate.format_sql">false</prop>
 				<prop key="hibernate.bytecode.use_reflection_optimizer">true</prop>
 				<prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</prop>
-				<prop key="hibernate.jdbc.batch_size">20</prop>
+				<prop key="hibernate.jdbc.batch_size">50</prop>
 				<prop key="hibernate.hbm2ddl.auto">update</prop>
 			</props>
 		</property>
 
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager"
+		p:sessionFactory-ref="sessionFactory">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
@@ -71,7 +77,6 @@
 	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-
 	<bean id="hibernateUtil" class="br.com.engine.persistence.core.HibernateUtil"
 		factory-method="init">
 		<constructor-arg ref="hibernateTemplate" />
@@ -79,21 +84,21 @@
 
 	<!-- DAO's definitions -->
 	<bean id="genericDAO" abstract="true"
-		class="br.com.engine.persistence.core.GenericDAO" >
+		class="br.com.engine.persistence.core.GenericDAO">
 		<property name="hibernateUtil" ref="hibernateUtil" />
 	</bean>
-
 	<bean id="userDAO" class="br.com.engine.persistence.dao.UserDAO"
 		autowire="byType" />
-		
 	<bean id="userGroupDAO" class="br.com.engine.persistence.dao.UserGroupDAO"
 		autowire="byType" />
-		
 	<bean id="sessionDAO" class="br.com.engine.persistence.dao.SessionDAO"
 		autowire="byType" />
-		
 	<bean id="permissionDAO" class="br.com.engine.persistence.dao.PermissionDAO"
 		autowire="byType" />
-		
-
+	<bean id="placeDAO" class="br.com.engine.persistence.dao.PlaceDAO"
+		autowire="byType" />
+	<bean id="unitDAO" class="br.com.engine.persistence.dao.UnitDAO"
+		autowire="byType" />
+	<bean id="buildingDAO" class="br.com.engine.persistence.dao.BuildingDAO"
+		autowire="byType" />
 </beans>

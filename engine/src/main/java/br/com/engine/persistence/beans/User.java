@@ -14,8 +14,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -45,6 +48,18 @@ public class User implements Serializable, TransportObjectInterface {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "userGroup_id")
 	private UserGroup userGroup;
+	
+	@OneToMany(fetch=FetchType.LAZY)
+	@Cascade(CascadeType.ALL)
+	@Fetch(FetchMode.SUBSELECT)
+	@JoinColumn(name = "user_id")
+	private Set<Building> buildings;
+	
+	@OneToMany(fetch=FetchType.LAZY)
+	@Cascade(CascadeType.ALL)
+	@Fetch(FetchMode.SUBSELECT)
+	@JoinColumn(name = "user_id")
+	private Set<Unit> units;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "user_permission", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "permission_id")})
@@ -53,6 +68,8 @@ public class User implements Serializable, TransportObjectInterface {
 	
 	public User() {
 		permissions = new HashSet<Permission>();
+		buildings = new HashSet<Building>();
+		units = new HashSet<Unit>();
 	}
 
 	/**
@@ -158,5 +175,33 @@ public class User implements Serializable, TransportObjectInterface {
 	 */
 	public void setPermissions(Set<Permission> permissions) {
 		this.permissions = permissions;
+	}
+
+	/**
+	 * @return the buildings
+	 */
+	public Set<Building> getBuildings() {
+		return buildings;
+	}
+
+	/**
+	 * @param buildings the buildings to set
+	 */
+	public void setBuildings(Set<Building> buildings) {
+		this.buildings = buildings;
+	}
+
+	/**
+	 * @return the units
+	 */
+	public Set<Unit> getUnits() {
+		return units;
+	}
+
+	/**
+	 * @param units the units to set
+	 */
+	public void setUnits(Set<Unit> units) {
+		this.units = units;
 	}
 }
