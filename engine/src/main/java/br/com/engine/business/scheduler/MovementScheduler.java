@@ -50,7 +50,9 @@ public class MovementScheduler {
 			if (unit.getCombatObject() != null) {
 				continue;
 			}
-
+			if (unit.getMovementObject() == null) {
+				continue;
+			}
 			Date timeToNextMove = unit.getTimeToNextMove();
 			if (timeToNextMove == null)
 				continue;
@@ -78,12 +80,15 @@ public class MovementScheduler {
 				// Execute next moviment.
 				if (!unit.getMovementObject().getMoves().isEmpty()) {
 					boolean isNextMoveValid = execMovement(unit);
-					if (!isNextMoveValid)
-						unit.getMovementObject().getMoves().clear();
+					if (!isNextMoveValid) {
+						unit.setMovementObject(null);
+						unit.setTimeToNextMove(null);
+					} else {
 
-					// Test ATTACK again :)
-					if (unit.getUnitIntent().equals(UnitIntentEnum.ATTACK)) {
-						execAttack(unit, enemy);
+						// Test ATTACK again :)
+						if (unit.getUnitIntent().equals(UnitIntentEnum.ATTACK)) {
+							execAttack(unit, enemy);
+						}
 					}
 				}
 
@@ -130,14 +135,27 @@ public class MovementScheduler {
 			return false;
 		}
 
+		// Run movement.
+		Unit myUnit = this.unitDAO.findById(unitObject.getId());
+		this.unitDAO.editPlace(myUnit, place);
+		// Edit actual position in cache.
+		// TODO Only edit cache after flush and clean session.
+		unitObject.setPlace(place.generateTransportObject());
+
 		// Calc time to next move.
 		Integer moveBuff = Utils.calcMoveBuff(unitObject.getType(),
 				place.getType());
 		Integer moveTime = Utils.DEFAULT_MOVE_TIME;
 
+		if (unitMovement.getMoves().isEmpty())
+			return false;
+
+		// Get next step.
+		Integer nextX = unitMovement.getMoves().pollFirst();
+		Integer nextY = unitMovement.getMoves().pollFirst();
+
 		// diagonal moviment
-		if (x != unitObject.getPlace().getX()
-				&& y != unitObject.getPlace().getY()) {
+		if (x != nextX && y != nextY) {
 			moveTime = Utils.DIAGONAL_MOVE_TIME;
 		}
 
@@ -147,14 +165,6 @@ public class MovementScheduler {
 		timeToNextMove.setTime(timeToNextMove.getTime() + moveTime);
 		unitObject.setTimeToNextMove(timeToNextMove);
 
-		// Run movement.
-		Unit myUnit = this.unitDAO.findById(unitObject.getId());
-		this.unitDAO.editPlace(myUnit, place);
-
-		// Edit actual position in cache.
-		// Put place in unit to cache
-		// TODO Only edit cache after flush and clean session.
-		unitObject.setPlace(place.generateTransportObject());
 		return true;
 	}
 
