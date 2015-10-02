@@ -29,6 +29,7 @@ import br.com.engine.persistence.dao.UserGroupDAO;
 
 public class UserGroupService {
 
+	private static final Logger LOGGER = Logger.getLogger(UserService.class);
 	@Autowired
 	private UserGroupDAO userGroupDAO;
 
@@ -43,5 +44,20 @@ public class UserGroupService {
 		return listUserGroupObject;
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public UserGroupObject create(UserGroupObject userGroupObject) throws Exception {
+		
+		LOGGER.info("Registering Group: "+ userGroupObject.getName());
+		
+		userGroupObject = userGroupDAO.create(userGroupObject).generateTransportObject();
+		return userGroupObject;
+		
+	}
+// Delete group 
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public void delete(String name)throws Exception {
+		UserGroup find = userGroupDAO.find(name);
+		this.userGroupDAO.destroy(find);
+	}
 	
 }
