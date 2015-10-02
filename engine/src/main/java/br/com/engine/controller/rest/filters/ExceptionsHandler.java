@@ -24,6 +24,10 @@ public class ExceptionsHandler implements ExceptionMapper<Throwable> {
 		 * use the Logger.
 		 * **********************************************************/
 		exception.printStackTrace();
+		/**********************FIXME********************************* 
+		 * printStackTrace, don't use for production. instead it 
+		 * use the Logger.
+		 * **********************************************************/
 
 		if (exception instanceof WebApplicationException) {
 			return ((WebApplicationException) exception).getResponse();

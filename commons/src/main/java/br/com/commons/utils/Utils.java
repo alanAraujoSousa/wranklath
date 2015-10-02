@@ -2,10 +2,12 @@ package br.com.commons.utils;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Deque;
 import java.util.UUID;
 
 import br.com.commons.enums.PlaceTypeEnum;
 import br.com.commons.enums.UnitTypeEnum;
+import br.com.commons.transport.PlaceObject;
 
 public class Utils {
 
@@ -387,7 +389,7 @@ public class Utils {
 	// Returns percents
 	public static Integer calcMoveBuff(UnitTypeEnum type, PlaceTypeEnum type2) {
 		// TODO Auto-generated method stub
-		return 0;
+		return 1;
 	}
 
 	
@@ -395,7 +397,7 @@ public class Utils {
 	public static Integer calcAttackBuff(UnitTypeEnum unit, UnitTypeEnum enemy,
 			PlaceTypeEnum place) {
 		// TODO Auto-generated method stub
-		return 0;
+		return 1;
 	}
 
 	public static Integer calcAttackPowerPerUnit(Integer atkPower, Integer unitQtd,
@@ -407,5 +409,11 @@ public class Utils {
 	public static Integer calcTotalLifePerUnit(Integer life, Integer armour) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public static boolean validateMovement(PlaceObject placeActual,
+			Deque<Integer> places) {
+		// TODO Auto-generated method stub
+		return true;
 	}
 }

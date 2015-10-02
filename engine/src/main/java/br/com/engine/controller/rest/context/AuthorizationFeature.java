@@ -27,8 +27,7 @@ public class AuthorizationFeature implements DynamicFeature {
 		Method method = resourceInfo.getResourceMethod();
 		if (method.isAnnotationPresent(Authorize.class)) {
 			
-			Authorize authenticate = method.getAnnotation(Authorize.class);
-			PermissionEnum[] permissionsRequired = authenticate.value();
+			PermissionEnum[] permissionsRequired = method.getAnnotation(Authorize.class).value();
 			
 			AuthorizationRestFilter authenticationFilter = new AuthorizationRestFilter(
 					userService, permissionsRequired);

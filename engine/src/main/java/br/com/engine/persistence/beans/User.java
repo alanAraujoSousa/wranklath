@@ -140,8 +140,8 @@ public class User implements Serializable, TransportObjectInterface {
 	@Override
 	public UserObject generateTransportObject() {
 		UserObject userObject = new UserObject();
+		userObject.setId(getId());
 		userObject.setLogin(getLogin());
-		userObject.setPassword(getPassword());
 		userObject.setUserGroup(getUserGroup().generateTransportObject());
 		for (Permission permission : getPermissions()) {
 			userObject.getPermissions().add(permission.getPermission().getId());			

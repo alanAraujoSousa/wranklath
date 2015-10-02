@@ -35,9 +35,6 @@ public class MovementScheduler {
 	@Autowired
 	private UnitDAO unitDAO;
 
-	/**
-	 * Calculate movements every 1 seconds
-	 */
 	@Scheduled(fixedDelay = 1000 * 1)
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public void runForestRun() {
@@ -54,10 +51,12 @@ public class MovementScheduler {
 				continue;
 			}
 
-			// if is correct time.
-			Date now = new Date();
 			Date timeToNextMove = unit.getTimeToNextMove();
-			
+			if (timeToNextMove == null)
+				continue;
+			Date now = new Date();
+
+			// if is correct time.
 			if (timeToNextMove.compareTo(now) <= 0 || timeToNextMove == null) {
 
 				// If my intent is attack other
@@ -162,7 +161,6 @@ public class MovementScheduler {
 	private boolean execAttack(UnitObject unitObject, UnitObject enemy) {
 
 		MovementObject enemyMovement = enemy.getMovementObject();
-		MovementObject unitMovement = unitObject.getMovementObject();
 
 		// Enemy actual position
 		Integer enemyActualX = enemy.getPlace().getX();
@@ -206,11 +204,11 @@ public class MovementScheduler {
 				combatObject.getSideB().add(enemy);
 				combatObject.setStartTime(new Date());
 				combatObject.setCombatId(combatUUID.toString());
-				
+
 				// Save reference of combat in army's.
 				unitObject.setCombatObject(combatObject);
 				enemy.setCombatObject(combatObject);
-				
+
 				// FIXME only give this power after receive the concret attack.
 				// If the enemy is stopped.
 				if (!enemyMovement.getMoves().isEmpty()) {
@@ -222,9 +220,9 @@ public class MovementScheduler {
 			}
 			UnitCache.getInstance().addToCombats(unitObject);
 
-			// My time to attack.O
+			// My time to attack.
 			unitObject.getTimeToNextMove().setTime(timeToNextAttack);
-			
+
 			return true;
 		} else { // Is not close to attack. >> PURSUIT >> .\ /.
 
@@ -247,7 +245,7 @@ public class MovementScheduler {
 			} else {
 				unitObject.setCombatObject(null);
 			}
-			
+
 			return false;
 		}
 	}

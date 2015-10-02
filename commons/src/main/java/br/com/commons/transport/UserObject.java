@@ -14,6 +14,8 @@ public class UserObject implements Serializable{
 	
 	private static final long serialVersionUID = -1014176920578255689L;
 	
+	private Long id;
+	
 	private String name;
 	
 	private String login;
@@ -96,5 +98,19 @@ public class UserObject implements Serializable{
 	 */
 	public void setPermissions(Set<Integer> permissions) {
 		this.permissions = permissions;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
 	}
 }

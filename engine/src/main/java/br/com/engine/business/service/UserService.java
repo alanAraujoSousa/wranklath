@@ -53,7 +53,8 @@ public class UserService {
 	public String login(String username, String password)
 			throws InvalidLoginException {
 
-		// Encrypt password for comparision with the password saved in the database.
+		// Encrypt password for comparision with the password saved in the
+		// database.
 		// All passwords in the database are encrypted.
 		password = CryptUtil.getInstance().aesEncrypt(password);
 
@@ -68,9 +69,9 @@ public class UserService {
 					.getLogin());
 			if (sessionObject != null) // if have session in cache.
 				return sessionObject.getToken();
-			
+
 			try { // if not.
-				Session session = this.sessionDAO.create(user); 
+				Session session = this.sessionDAO.create(user);
 				String token = session.getToken();
 				cacheProvider.add(token, session.generateTransportObject());
 				return token;
@@ -178,10 +179,23 @@ public class UserService {
 		return listUserObject;
 	}
 
-	public void authorize(PermissionEnum[] permissionsRequired, String token) {
+	public UserObject findUserBySessionToken(String token) {
+		SessionObject session = findSessionByToken(token);
+		return session.getUser();
+	}
+	
+	public SessionObject findSessionByToken(String token) {
 		SessionObject session = SessionCache.getInstance().findSessionByToken(
 				token);
+		if (session != null) 
+			return session;
+		else
+			throw new InvalidTokenException("Token don't have a valid session.");
+	}
 
+	public void authorize(PermissionEnum[] permissionsRequired, String token) {
+		SessionObject session = findSessionByToken(token);
+		 
 		UserObject user = session.getUser();
 		Set<Integer> userPermissions = user.getPermissions();
 		UserGroupObject userGroup = user.getUserGroup();
@@ -189,6 +203,11 @@ public class UserService {
 			Set<Integer> groupPermissions = userGroup.getPermissions();
 			userPermissions.addAll(groupPermissions);
 		}
+		
+		// Admin rule them all \o/ vlw flws
+		if (userPermissions.contains(PermissionEnum.ADMIN.getId()))
+			return;
+			
 		// LOGGING
 		StringBuilder stringBuilder = new StringBuilder();
 		for (PermissionEnum permissionRequired : permissionsRequired) {
@@ -200,14 +219,6 @@ public class UserService {
 		for (PermissionEnum permissionRequired : permissionsRequired) {
 			boolean flag = false;
 			for (Integer permissionObject : userPermissions) {
-
-				if (permissionObject.equals(PermissionEnum.ADMIN.getId())) // Admin
-																			// rule
-																			// them
-																			// all
-																			// \o/
-					return;
-
 				if (permissionRequired.getId() == permissionObject) {
 					flag = true;
 					break;
