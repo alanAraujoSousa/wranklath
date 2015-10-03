@@ -6,32 +6,38 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <h:head>
+	<link href="../css/bootstrap-theme.min.css" rel="stylesheet"
+		type="text/css" />
+	<link href="../css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<link href="../css/font-awesome.min.css" rel="stylesheet"
+		type="text/css" />
 </h:head>
 
 <h:body>
-	<div id="page">
-		<div id="header-container">
+	<script src="../js/jquery.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+	
+	<div id="page" class="container-fluid">
+		<div id="header-container" class="navbar-fixed-top">
 			<div id="header">
 				<ui:insert name="header">
 					<ui:include src="common/commonHeader.xhtml" />
 				</ui:insert>
 			</div>
 		</div>
-		<div id="content-container">
-			<div id="content">
+		<div id="content-container" class="row">
+			<div id="content" class="col-md-10">
 				<ui:insert name="content">
 					<ui:include src="common/commonContent.xhtml" />
 				</ui:insert>
 			</div>
-		</div>
-		<div id="sidebar-container">
-			<div id="sidebar">
+			<div id="sidebar" class="col-md-2">
 				<ui:insert name="sidebar">
 					<ui:include src="common/commonSidebar.xhtml" />
 				</ui:insert>
 			</div>
 		</div>
-		<div id="footer-container">
+		<div id="footer-container" class="footer">
 			<div id="footer">
 				<ui:insert name="footer">
 					<ui:include src="common/commonFooter.xhtml" />

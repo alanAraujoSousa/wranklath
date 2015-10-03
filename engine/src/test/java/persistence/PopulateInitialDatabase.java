@@ -64,38 +64,36 @@ public class PopulateInitialDatabase {
 		// +++++++++++++++++__WARNING__++++++++++++++++++
 		// Heavy database operation.
 
-		// saveMap();
+		 saveMap();
 
 		// Heavy database operation.
 		// +++++++++++++++++__WARNING__++++++++++++++++++
 
-		saveAllPermissions();
-		saveAllGroups();
-		saveAllUser();
-		saveAllTowns();
-		saveAllArmys();
-		assignPermissionToGroups();
-		assignPermissionToUsers();
+//		saveAllPermissions();
+//		saveAllGroups();
+//		saveAllUser();
+//		saveAllTowns();
+//		saveAllArmys();
+//		assignPermissionToGroups();
+//		assignPermissionToUsers();
 	}
 
 	private void saveMap() {
 		Date startDateOfBatchProcess = new Date();
-		for (int x = 0; x < 5000; x++) {
-			System.out.println("x: " + x + " fill 5000 Y's.");
-			for (int y = 0; y < 5000; y++) {
+		for (int x = 1; x <= 5000; x++) {
+			System.out.println("Commiting x: " + x + " fill 5000 Y's.");
+			for (int y = 1; y <= 5000; y++) {
 				Place place = new Place(x, y);
 				HibernateUtil.getInstance().currentSession().save(place);
-				if (y % 50 == 0) {
-					HibernateUtil.getInstance().currentSession().flush();
-					HibernateUtil.getInstance().currentSession().clear();
-				}
 			}
+			HibernateUtil.getInstance().currentSession().flush();
+			HibernateUtil.getInstance().currentSession().clear();
 		}
 		Date endDateOfBatchProcess = new Date();
 		System.out
-				.println("Time spent (in milliseconds) with batch processing: "
-						+ (endDateOfBatchProcess.getTime() - startDateOfBatchProcess
-								.getTime()));
+				.println("Time spent (in minutes) with batch processing: "
+						+ ((endDateOfBatchProcess.getTime() - startDateOfBatchProcess
+								.getTime()) / 3600000));
 	}
 
 	private List<User> saveAllUser() throws Exception {
