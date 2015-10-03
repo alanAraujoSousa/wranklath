@@ -20,6 +20,7 @@
 <body>
     <script src="./rsrc/js/jquery.min.js"></script>
     <script src="./rsrc/js/bootstrap.min.js"></script>
+    <script src="./rsrc/js/main.js"></script>
 
     <body>
         <div class="container-fluid">
@@ -41,7 +42,6 @@
             </div>
 
             <div class></div>
-
             <div class="col-xs-12" style="height:10px;"></div>
             <!-- Que coisa feia 01 :( -->
 
@@ -84,62 +84,104 @@
                 </div>
                 <div class="col-md-3">
                     <div class="row">
-                        <div class="widget">
 
-                            <form class="form-signin">
-                                <div class="widget-body">
-                                    <div class="input-group mb-6">
-                                        <span class="input-group-addon">
-											<i class="fa fa-user"></i>
-										</span>
-                                        <input type="text" id="inputLogin" class="form-control" placeholder="login" required="" autofocus="">
-                                    </div>
-                                    <div class="input-group mb-6">
-                                        <span class="input-group-addon">
-											<i class="fa fa-unlock"></i>
-										</span>
-                                        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="">
-                                    </div>
+                        <div id="login-content">
+                            <form id="login-form" class="form-signin">
+
+                                <div class="input-group mb-6">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                    <input type="text" id="inputLogin" class="form-control" placeholder="login" required autofocus>
                                 </div>
-                                <div class="widget-footer">
-                                    <button class="btn btn-default btn-success btn-block" type="submit">Sign in</button>
-                                    <button class="btn btn-default btn-primary btn-block" type="submit">Sign up</button>
+                                <div class="input-group mb-6">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                                    </span>
+                                    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
                                 </div>
+                                <button class="btn btn-default btn-success btn-block" type="submit">Sign in</button>
                             </form>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="widget">
-                            <div class="widget-body">
-                                <table class="table table-striped">
-                                    <caption>Estatisticas</caption>
-                                    <thead>
-                                        <tr>
-                                            <th>mapas</th>
-                                            <th>total</th>
-                                            <th>online</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">1</th>
-                                            <td>999</td>
-                                            <td>90</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">2</th>
-                                            <td>909</td>
-                                            <td>990</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">3</th>
-                                            <td>990</td>
-                                            <td>990</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+
+                            <div class="form-group">
+                                <div class="col-md-12 control">
+                                    <div>
+                                        <button class="btn btn-default btn-primary btn-block" onClick="$('#login-content').hide(); $('#signup-content').show();">Sign up</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        <div id="signup-content" style="display:none">
+                            <form id="signup-form" class="form-horizontal" role="form">
+
+                                <div id="signupalert" style="display:none" class="alert alert-danger">
+                                    <p>Error:</p>
+                                    <span></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email" class="col-md-3 control-label">Email</label>
+                                    <div class="col-md-9">
+                                        <input type="text" class="form-control" name="email" placeholder="Email Address" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="login" class="col-md-3 control-label">Login</label>
+                                    <div class="col-md-9">
+                                        <input type="text" class="form-control" name="login" placeholder="Login" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password" class="col-md-3 control-label">Password</label>
+                                    <div class="col-md-9">
+                                        <input type="password" class="form-control" name="passwd" placeholder="Password" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="nome" class="col-md-3 control-label">Nome</label>
+                                    <div class="col-md-9">
+                                        <input type="text" class="form-control" name="nome" placeholder="Nome">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-offset-5 col-md-4">
+                                        <button id="btn-signup" type="button" class="btn btn-info">Sign up</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="col-md-offset-5">
+                                <button id="login-return" class="btn btn-sm btn-danger" onclick="$('#signup-content').hide(); $('#login-content').show()">Return to login</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <table class="table table-striped">
+                            <caption>Estatisticas</caption>
+                            <thead>
+                                <tr>
+                                    <th>mapas</th>
+                                    <th>total</th>
+                                    <th>online</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>999</td>
+                                    <td>90</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>909</td>
+                                    <td>990</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">3</th>
+                                    <td>990</td>
+                                    <td>990</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
