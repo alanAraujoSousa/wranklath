@@ -16,12 +16,13 @@ public class UnitObject {
 	
 	private Long id;
 	private Integer type;
-	private Integer unitIntent;
 	private Integer quantity;
+	private PlaceObject place;
+
+	private Integer unitIntent;
 	private Date timeToNextMove;
 	private MovementObject movementObject;
 	private CombatObject combatObject;
-	private PlaceObject place;
 	
 	// FIXME to remove
 	private Long targetId;

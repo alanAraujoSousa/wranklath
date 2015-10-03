@@ -14,6 +14,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import br.com.commons.enums.UnitTypeEnum;
+import br.com.commons.transport.UnitObject;
 import br.com.commons.transport.interfaces.TransportObjectInterface;
 
 @Entity
@@ -42,10 +43,14 @@ public class Unit implements Serializable, TransportObjectInterface{
 	private Integer quantity;
 
 	
-	@Override
-	public <T> T generateTransportObject() {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public UnitObject generateTransportObject() {
+		UnitObject unitObject = new UnitObject();
+		unitObject.setId(getId());
+		unitObject.setPlace(getPlace().generateTransportObject());
+		unitObject.setQuantity(getQuantity());
+		unitObject.setType(getType());
+		return unitObject;
 	}
 
 	/**

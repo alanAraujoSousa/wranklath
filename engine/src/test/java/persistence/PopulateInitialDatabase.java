@@ -16,8 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.commons.enums.BuildingTypeEnum;
 import br.com.commons.enums.PermissionEnum;
+import br.com.commons.enums.UnitTypeEnum;
 import br.com.commons.transport.BuildingObject;
 import br.com.commons.transport.PermissionObject;
+import br.com.commons.transport.UnitObject;
 import br.com.commons.transport.UserGroupObject;
 import br.com.commons.transport.UserObject;
 import br.com.commons.utils.CryptUtil;
@@ -29,6 +31,7 @@ import br.com.engine.persistence.core.HibernateUtil;
 import br.com.engine.persistence.dao.BuildingDAO;
 import br.com.engine.persistence.dao.PermissionDAO;
 import br.com.engine.persistence.dao.PlaceDAO;
+import br.com.engine.persistence.dao.UnitDAO;
 import br.com.engine.persistence.dao.UserDAO;
 import br.com.engine.persistence.dao.UserGroupDAO;
 
@@ -45,6 +48,9 @@ public class PopulateInitialDatabase {
 	
 	@Autowired
 	private BuildingDAO buildingDAO;
+
+	@Autowired
+	private UnitDAO unitDAO;
 
 	@Autowired
 	private PermissionDAO permissionDAO;
@@ -64,9 +70,10 @@ public class PopulateInitialDatabase {
 		// +++++++++++++++++__WARNING__++++++++++++++++++
 
 		saveAllPermissions();
-		List<UserGroup> allGroups = saveAllGroups();
-		List<User> allUsers = saveAllUser(allGroups);
-		saveAllTowns(allUsers);
+		saveAllGroups();
+		saveAllUser();
+		saveAllTowns();
+		saveAllArmys();
 		assignPermissionToGroups();
 		assignPermissionToUsers();
 	}
@@ -91,7 +98,9 @@ public class PopulateInitialDatabase {
 								.getTime()));
 	}
 
-	private List<User> saveAllUser(List<UserGroup> listGroups) throws Exception {
+	private List<User> saveAllUser() throws Exception {
+		
+		List<UserGroup> listGroups = this.userGroupDAO.list();
 
 		List<User> users = new ArrayList<>();
 
@@ -140,15 +149,31 @@ public class PopulateInitialDatabase {
 		return users;
 	}
 
-	private void saveAllTowns(List<User> allUsers) {
+	private void saveAllTowns() {
+		List<User> allUsers = this.userDAO.list();
 		Date now = new Date();
-		int randomCoordinate = new Random().nextInt(4000);
+		int randomCoordinate = new Random().nextInt(2000);
 		for (User user : allUsers) {
 			BuildingObject buildingObject = new BuildingObject();
 			buildingObject.setConclusionDate(now);
 			buildingObject.setType(BuildingTypeEnum.TOWN);
 			Place place = this.placeDAO.findByCoordinates(randomCoordinate, randomCoordinate);
 			this.buildingDAO.create(buildingObject, user, place);
+			randomCoordinate += 30;
+		}
+	}
+	
+	private void saveAllArmys() {
+		List<User> allUsers = this.userDAO.list();
+		int randomCoordinate = new Random().nextInt(2000);
+		randomCoordinate += 2500;
+		UnitTypeEnum[] values = UnitTypeEnum.values();
+		for (User user : allUsers) {
+			UnitObject unitObject = new UnitObject();
+			unitObject.setType(values[new Random().nextInt(2)]);
+			unitObject.setQuantity(30);
+			Place place = this.placeDAO.findByCoordinates(randomCoordinate, randomCoordinate);
+			unitDAO.create(unitObject, user, place);
 			randomCoordinate += 30;
 		}
 	}
