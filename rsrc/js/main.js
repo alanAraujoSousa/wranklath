@@ -19,7 +19,7 @@ $(document).ready(function () {
         move: "/unit/move",
     };
 
-    $('#inputLogin').click(function () {
+    $('#btnLogin').click(function () {
         var login = $('#inputLogin').val();
         var pass = $('#inputPassword').val();
 
