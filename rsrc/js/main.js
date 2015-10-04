@@ -1,11 +1,11 @@
 $(document).ready(function () {
+
     $(window).on('hashchange', function () {
         hash = window.location.hash;
         switch (hash) {
-            case "/#/main":
-                window.location.replace('http://' + domain + ':' + domainPort + '/html/main.html');
-            default
-                window.location.replace('http://' + domain + ':' + domainPort + '/index.html');
+            case "#/main":
+                window.location.replace('http://' + domain + ':' + domainPort + '/rsrc/html/main.html');
+                break;
         }
     });
 
@@ -25,8 +25,8 @@ $(document).ready(function () {
 
         var user = new Object();
 
-        user.login = loginInformed;
-        user.password = passInformed;
+        user.login = login;
+        user.password = pass;
         $.ajax({
                 url: 'http://' + domain + ':' + domainPort + apiRoute + userRest.login,
                 type: 'POST',
@@ -38,7 +38,7 @@ $(document).ready(function () {
                     token = jqXHR.responseText();
                     document.cookie = "token=" + token;
                     alert(token);
-                    window.location.hash = "/#/main";
+                    window.location.hash = "/main";
                 } else {
                     alert("falhou!! codigo retornado: " + jqXHR.status + ", tratar este código devidamente.");
                 }
