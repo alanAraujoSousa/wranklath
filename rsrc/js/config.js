@@ -1,3 +1,3 @@
-domain = "project-medievo.rhcloud.com";
-domainPort = 80;
-apiRoute = "/project/rest";
+domain = "localhost";
+domainPort = 8080;
+apiRoute = "/wranklath/rest";

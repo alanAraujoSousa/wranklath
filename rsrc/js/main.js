@@ -30,15 +30,16 @@ $(document).ready(function () {
         $.ajax({
                 url: 'http://' + domain + ':' + domainPort + apiRoute + userRest.login,
                 type: 'POST',
-                dataType: 'json',
-                data: user
+                data: JSON.stringify(user),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json'
             })
             .always(function (jqXHR) {
                 if (jqXHR.status == 200) {
                     token = jqXHR.responseText();
                     document.cookie = "token=" + token;
                     alert(token);
-                    window.location.hash = "/main";
+//                    window.location.hash = "/main";
                 } else {
                     alert("falhou!! codigo retornado: " + jqXHR.status + ", tratar este código devidamente.");
                 }
