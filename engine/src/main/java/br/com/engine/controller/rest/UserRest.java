@@ -55,7 +55,8 @@ public class UserRest {
 	@DELETE
 	@Path("/{userLogin}")
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public Response deleteUser(@HeaderParam("token") final String token, @PathParam("userLogin") String userLoginInformed) throws Exception {
+	public Response deleteUser(@HeaderParam("token") final String token,
+			@PathParam("userLogin") String userLoginInformed) throws Exception {
 		this.userService.delete(userLoginInformed);
 		return Response.ok().build();
 	}
@@ -75,8 +76,7 @@ public class UserRest {
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response listAllUsers(@HeaderParam("token") final String token) {
-		final List<UserObject> listUserObject = this.userService
-				.listAllUsers();
+		final List<UserObject> listUserObject = this.userService.listAllUsers();
 		if (!listUserObject.isEmpty()) {
 			return Response.ok(
 					new GenericEntity<List<UserObject>>(listUserObject) {
@@ -86,14 +86,21 @@ public class UserRest {
 		}
 	}
 
-	/* Test */
 	@POST
 	@Path("/verify")
 	public Response verifyToken(@HeaderParam("token") final String token) {
 
-		LOGGER.debug("verify");
-		
 		this.userService.extendTokenExpiration(token);
+		return Response.ok().build();
+	}
+
+	/* Test */
+	@POST
+	@Path("/ping")
+	public Response ping() {
+
+		LOGGER.debug("ping");
+
 		return Response.ok().build();
 	}
 }

@@ -26,6 +26,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 	
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
+		
 		// When HttpMethod comes as OPTIONS, just acknowledge that it accepts.
         if ( requestContext.getMethod().equalsIgnoreCase( "OPTIONS" ) ) {
             LOGGER.info( "HTTP Method (OPTIONS) - Detected!" );

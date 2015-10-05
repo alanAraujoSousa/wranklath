@@ -53,6 +53,7 @@ public class UnitDAO extends GenericDAO<Unit> {
 		Unit unit = new Unit();
 		unit.setUser(user);
 		unit.setPlace(place);
+		place.setUnit(unit);
 		unit.setType(unitObject.getType());
 		unit.setQuantity(unitObject.getQuantity());
 		

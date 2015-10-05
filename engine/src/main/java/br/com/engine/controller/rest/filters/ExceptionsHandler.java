@@ -7,6 +7,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.jboss.resteasy.spi.DefaultOptionsMethodException;
 import org.springframework.stereotype.Component;
 
 import br.com.commons.exceptions.ProjectException;
@@ -19,6 +20,10 @@ public class ExceptionsHandler implements ExceptionMapper<Throwable> {
 
 	@Override
 	public Response toResponse(Throwable exception) {
+		if (exception instanceof DefaultOptionsMethodException) {
+			return Response.ok().build();
+		}
+		
 		/**********************FIXME********************************* 
 		 * printStackTrace, don't use for production. instead it 
 		 * use the Logger.

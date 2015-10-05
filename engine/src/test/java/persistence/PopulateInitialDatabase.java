@@ -23,8 +23,9 @@ import br.com.commons.transport.UnitObject;
 import br.com.commons.transport.UserGroupObject;
 import br.com.commons.transport.UserObject;
 import br.com.commons.utils.CryptUtil;
-import br.com.engine.persistence.beans.Place;
+import br.com.commons.utils.Utils;
 import br.com.engine.persistence.beans.Permission;
+import br.com.engine.persistence.beans.Place;
 import br.com.engine.persistence.beans.User;
 import br.com.engine.persistence.beans.UserGroup;
 import br.com.engine.persistence.core.HibernateUtil;
@@ -64,25 +65,26 @@ public class PopulateInitialDatabase {
 		// +++++++++++++++++__WARNING__++++++++++++++++++
 		// Heavy database operation.
 
-		 saveMap();
+//		 saveMap();
 
 		// Heavy database operation.
 		// +++++++++++++++++__WARNING__++++++++++++++++++
 
-//		saveAllPermissions();
-//		saveAllGroups();
-//		saveAllUser();
-//		saveAllTowns();
-//		saveAllArmys();
-//		assignPermissionToGroups();
-//		assignPermissionToUsers();
+		saveAllPermissions();
+		saveAllGroups();
+		saveAllUser();
+		saveAllTowns();
+		saveAllArmys();
+		assignPermissionToGroups();
+		assignPermissionToUsers();
 	}
 
 	private void saveMap() {
 		Date startDateOfBatchProcess = new Date();
-		for (int x = 1; x <= 5000; x++) {
-			System.out.println("Commiting x: " + x + " fill 5000 Y's.");
-			for (int y = 1; y <= 5000; y++) {
+		
+		for (int x = 1; x <= Utils.MAP_SIZE; x++) {
+			System.out.println("Commiting x: " + x + " fill 1000 Y's.");
+			for (int y = 1; y <= Utils.MAP_SIZE; y++) {
 				Place place = new Place(x, y);
 				HibernateUtil.getInstance().currentSession().save(place);
 			}
@@ -93,7 +95,7 @@ public class PopulateInitialDatabase {
 		System.out
 				.println("Time spent (in minutes) with batch processing: "
 						+ ((endDateOfBatchProcess.getTime() - startDateOfBatchProcess
-								.getTime()) / 3600000));
+								.getTime()) / 60000));
 	}
 
 	private List<User> saveAllUser() throws Exception {
@@ -150,7 +152,7 @@ public class PopulateInitialDatabase {
 	private void saveAllTowns() {
 		List<User> allUsers = this.userDAO.list();
 		Date now = new Date();
-		int randomCoordinate = new Random().nextInt(2000);
+		int randomCoordinate = 300;
 		for (User user : allUsers) {
 			BuildingObject buildingObject = new BuildingObject();
 			buildingObject.setConclusionDate(now);
@@ -163,12 +165,11 @@ public class PopulateInitialDatabase {
 	
 	private void saveAllArmys() {
 		List<User> allUsers = this.userDAO.list();
-		int randomCoordinate = new Random().nextInt(2000);
-		randomCoordinate += 2500;
+		int randomCoordinate = 50;
 		UnitTypeEnum[] values = UnitTypeEnum.values();
 		for (User user : allUsers) {
 			UnitObject unitObject = new UnitObject();
-			unitObject.setType(values[new Random().nextInt(2)]);
+			unitObject.setType(values[new Random().nextInt(3)]);
 			unitObject.setQuantity(30);
 			Place place = this.placeDAO.findByCoordinates(randomCoordinate, randomCoordinate);
 			unitDAO.create(unitObject, user, place);

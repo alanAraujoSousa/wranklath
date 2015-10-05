@@ -41,6 +41,7 @@ public class BuildingDAO extends GenericDAO<Building> {
 		Building building = new Building();
 		building.setUser(user);
 		building.setPlace(place);
+		place.setBuilding(building);
 		building.setType(buildingObject.getType());
 		building.setConclusionDate(buildingObject.getConclusionDate());
 

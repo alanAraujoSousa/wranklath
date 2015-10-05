@@ -54,7 +54,7 @@
 				<prop key="hibernate.bytecode.use_reflection_optimizer">true</prop>
 				<prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</prop>
 				<prop key="hibernate.jdbc.batch_size">50</prop>
-				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.hbm2ddl.auto">none</prop>
 			</props>
 		</property>
 

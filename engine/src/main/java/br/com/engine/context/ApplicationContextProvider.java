@@ -49,17 +49,21 @@ public class ApplicationContextProvider implements ApplicationContextAware,
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		UnitDAO UnitDAO = context.getBean(UnitDAO.class);
-		List<Unit> list = UnitDAO.list();
-		if (!list.isEmpty()) {
-			int cont = 0;
-			LOGGER.info("\n\n\nInitializing army's on application\n\n\n");
-			for (Unit unit : list) {
-				UnitObject army = unit.generateTransportObject();
-				UnitCache.getInstance().addToMoviments(army);
-				cont++;
+		try {
+			UnitDAO UnitDAO = context.getBean(UnitDAO.class);
+			List<Unit> list = UnitDAO.list();
+			if (!list.isEmpty()) {
+				int cont = 0;
+				LOGGER.info("\n\n\nInitializing army's on application\n\n\n");
+				for (Unit unit : list) {
+					UnitObject army = unit.generateTransportObject();
+					UnitCache.getInstance().addToMoviments(army);
+					cont++;
+				}
+				LOGGER.info("Army's initialized: " + cont);
 			}
-			LOGGER.info("Army's initialized: " + cont);
-		} 
+		} catch (Exception e) {
+			LOGGER.error("Failed to load armys in cache: " + e.getMessage());
+		}
 	}
 }

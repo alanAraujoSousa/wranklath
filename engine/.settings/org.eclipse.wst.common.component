@@ -9,6 +9,6 @@
         </dependent-module>
         <property name="java-output-path" value="/engine/target/classes"/>
         <property name="component.exclusion.patterns" value="WEB-INF/lib/servlet-api-2.5jar"/>
-        <property name="context-root" value="project"/>
+        <property name="context-root" value="wranklath"/>
     </wb-module>
 </project-modules>

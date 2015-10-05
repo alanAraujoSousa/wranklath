@@ -17,6 +17,7 @@ public class Utils {
 	public final static int COMBAT_ROUND_TIME = 30000; // milliseconds
 	public final static int ORTOGONAL_COST = 1;
 	public final static double DIAGONAL_COST = 1.5;
+	public static final int MAP_SIZE = 1000;
 	
 
 	/**

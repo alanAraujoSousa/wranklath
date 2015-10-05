@@ -142,7 +142,7 @@ public class User implements Serializable, TransportObjectInterface {
 		UserObject userObject = new UserObject();
 		userObject.setId(getId());
 		userObject.setLogin(getLogin());
-		userObject.setUserGroup(getUserGroup().generateTransportObject());
+		userObject.setUserGroup(getUserGroup() != null ? getUserGroup().generateTransportObject() : null);
 		for (Permission permission : getPermissions()) {
 			userObject.getPermissions().add(permission.getPermission().getId());			
 		}

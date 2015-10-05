@@ -19,35 +19,35 @@ import br.com.commons.transport.interfaces.TransportObjectInterface;
 
 @Entity
 @Table(name = "unit")
-public class Unit implements Serializable, TransportObjectInterface{
+public class Unit implements Serializable, TransportObjectInterface {
 
 	private static final long serialVersionUID = 4033075341539905879L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", unique = true)
 	private Long id;
-	
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id")
 	private User user;
-	
+
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "place_id")
 	private Place place;
-	
+
 	@Column(name = "type")
 	private Integer type;
 
 	@Column(name = "quantity")
 	private Integer quantity;
 
-	
 	@SuppressWarnings("unchecked")
 	public UnitObject generateTransportObject() {
 		UnitObject unitObject = new UnitObject();
 		unitObject.setId(getId());
-		unitObject.setPlace(getPlace().generateTransportObject());
+		unitObject.setPlace(getPlace() != null ? getPlace()
+				.generateTransportObject() : null);
 		unitObject.setQuantity(getQuantity());
 		unitObject.setType(getType());
 		return unitObject;
@@ -61,7 +61,8 @@ public class Unit implements Serializable, TransportObjectInterface{
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(Long id) {
 		this.id = id;
@@ -75,7 +76,8 @@ public class Unit implements Serializable, TransportObjectInterface{
 	}
 
 	/**
-	 * @param user the user to set
+	 * @param user
+	 *            the user to set
 	 */
 	public void setUser(User user) {
 		this.user = user;
@@ -89,7 +91,8 @@ public class Unit implements Serializable, TransportObjectInterface{
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param type
+	 *            the type to set
 	 */
 	public void setType(UnitTypeEnum type) {
 		if (type != null) {
@@ -105,7 +108,8 @@ public class Unit implements Serializable, TransportObjectInterface{
 	}
 
 	/**
-	 * @param place the place to set
+	 * @param place
+	 *            the place to set
 	 */
 	public void setPlace(Place place) {
 		this.place = place;
@@ -119,10 +123,11 @@ public class Unit implements Serializable, TransportObjectInterface{
 	}
 
 	/**
-	 * @param quantity the quantity to set
+	 * @param quantity
+	 *            the quantity to set
 	 */
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
-	
+
 }

@@ -18,8 +18,8 @@
 	<!-- Comment bean SpringBeanProcessorServletAware when populate initial database -->
 	
 	<!--
- 	<bean class="org.jboss.resteasy.plugins.spring.SpringBeanProcessorServletAware" />
 	-->
+ 	<bean class="org.jboss.resteasy.plugins.spring.SpringBeanProcessorServletAware" />
 
 	<import resource="dao.xml" />
 	<import resource="services.xml" />
