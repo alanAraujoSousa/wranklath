@@ -20,175 +20,176 @@
 <body>
     <script src="./rsrc/js/jquery.min.js"></script>
     <script src="./rsrc/js/bootstrap.min.js"></script>
-    <script src="./rsrc/js/main.js"></script>
     <script src="./rsrc/js/config.js"></script>
+    <script src="./rsrc/js/main.js"></script>
 
-    <body>
-        <div class="container-fluid">
-            <div class="row text-center page-header" name="title">
-                <h1>PROJECT-DEMO</h1></div>
+    <div class="page-loader"></div>
 
-            <div class="row" name="menu">
-                <div class="col-md-8 col-md-offset-2">
-                    <nav>
-                        <ul class="nav nav-justified">
-                            <li class="active"><a href="#">Home</a></li>
-                            <li><a href="./rsrc/html/oJogo.html">O Jogo</a></li>
-                            <li><a href="./rsrc/html/guias.html">Guias</a></li>
-                            <li><a href="./rsrc/html/midia.html">Midia</a></li>
-                            <li><a href="./rsrc/html/eventos.html">Eventos</a></li>
-                        </ul>
-                    </nav>
+    <div class="container-fluid" id="page">
+        <div class="row text-center page-header" name="title">
+            <h1>PROJECT-DEMO</h1></div>
+
+        <div class="row" name="menu">
+            <div class="col-md-8 col-md-offset-2">
+                <nav>
+                    <ul class="nav nav-justified">
+                        <li class="active"><a href="#">Home</a></li>
+                        <li><a href="./rsrc/html/oJogo.html">O Jogo</a></li>
+                        <li><a href="./rsrc/html/guias.html">Guias</a></li>
+                        <li><a href="./rsrc/html/midia.html">Midia</a></li>
+                        <li><a href="./rsrc/html/eventos.html">Eventos</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div class></div>
+        <div class="col-xs-12" style="height:10px;"></div>
+        <!-- Que coisa feia 01 :( -->
+
+        <div class="row">
+            <!-- Carrocel -->
+            <div class="col-md-5 col-md-offset-2">
+                <div id="myCarousel" class="carousel slide" data-ride="carousel">
+
+                    <ol class="carousel-indicators">
+                        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                        <li data-target="#myCarousel" data-slide-to="1"></li>
+                        <li data-target="#myCarousel" data-slide-to="2"></li>
+                        <li data-target="#myCarousel" data-slide-to="3"></li>
+                    </ol>
+
+                    <div class="carousel-inner" role="listbox">
+                        <div class="item active">
+                            <img src="./rsrc/img/slide1.jpg" alt="sld1">
+                        </div>
+                        <div class="item">
+                            <img src="./rsrc/img/slide2.jpg" alt="sld2">
+                        </div>
+                        <div class="item">
+                            <img src="./rsrc/img/slide3.jpg" alt="sld3">
+                        </div>
+                        <div class="item">
+                            <img src="./rsrc/img/slide4.jpg" alt="sld4">
+                        </div>
+                    </div>
+
+                    <!-- controles de mudar-->
+                    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
                 </div>
             </div>
 
-            <div class></div>
-            <div class="col-xs-12" style="height:10px;"></div>
-            <!-- Que coisa feia 01 :( -->
+            <!-- form login -->
+            <div class="col-md-3">
 
-            <div class="row">
-                <!-- Carrocel -->
-                <div class="col-md-5 col-md-offset-2">
-                    <div id="myCarousel" class="carousel slide" data-ride="carousel">
+                <div class="row">
 
-                        <ol class="carousel-indicators">
-                            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-                            <li data-target="#myCarousel" data-slide-to="1"></li>
-                            <li data-target="#myCarousel" data-slide-to="2"></li>
-                            <li data-target="#myCarousel" data-slide-to="3"></li>
-                        </ol>
+                    <div id="login-content">
+                        <form id="login-form" class="form-signin">
 
-                        <div class="carousel-inner" role="listbox">
-                            <div class="item active">
-                                <img src="./rsrc/img/slide1.jpg" alt="sld1">
+                            <div class="input-group mb-6">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                <input type="text" id="inputLogin" class="form-control" placeholder="login" required autofocus>
                             </div>
-                            <div class="item">
-                                <img src="./rsrc/img/slide2.jpg" alt="sld2">
+                            <div class="input-group mb-6">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                                </span>
+                                <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
                             </div>
-                            <div class="item">
-                                <img src="./rsrc/img/slide3.jpg" alt="sld3">
-                            </div>
-                            <div class="item">
-                                <img src="./rsrc/img/slide4.jpg" alt="sld4">
+                            <button id="btnLogin" class="btn btn-default btn-success btn-block">Sign in</button>
+                        </form>
+
+                        <div class="col-md-12 control">
+                            <div>
+                                <button class="btn btn-default btn-primary btn-block" onClick="$('#login-content').hide(); $('#signup-content').show();">Sign up</button>
                             </div>
                         </div>
-
-                        <!-- controles de mudar-->
-                        <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-                            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-                            <span class="sr-only">Previous</span>
-                        </a>
-                        <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-                            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-                            <span class="sr-only">Next</span>
-                        </a>
                     </div>
+
+                    <div id="signup-content" style="display:none">
+                        <form id="signup-form" class="form-horizontal" role="form">
+
+                            <div id="signupalert" style="display:none" class="alert alert-danger">
+                                <p>Error:</p>
+                                <span></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="col-md-3 control-label">Email</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" name="email" placeholder="Email Address" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="login" class="col-md-3 control-label">Login</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" name="login" placeholder="Login" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="col-md-3 control-label">Password</label>
+                                <div class="col-md-9">
+                                    <input type="password" class="form-control" name="passwd" placeholder="Password" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="nome" class="col-md-3 control-label">Nome</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" name="nome" placeholder="Nome">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-offset-5 col-md-4">
+                                    <button id="btn-signup" type="button" class="btn btn-info">Sign up</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="col-md-offset-5">
+                            <button id="login-return" class="btn btn-sm btn-danger" onclick="$('#signup-content').hide(); $('#login-content').show()">Return to login</button>
+                        </div>
+                    </div>
+
                 </div>
-
-                <!-- form login -->
-                <div class="col-md-3">
-
-                    <div class="row">
-
-                        <div id="login-content">
-                            <form id="login-form" class="form-signin">
-
-                                <div class="input-group mb-6">
-                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                                    <input type="text" id="inputLogin" class="form-control" placeholder="login" required autofocus>
-                                </div>
-                                <div class="input-group mb-6">
-                                    <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                                    </span>
-                                    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-                                </div>
-                                <button id="btnLogin" class="btn btn-default btn-success btn-block">Sign in</button>
-                            </form>
-
-                            <div class="col-md-12 control">
-                                <div>
-                                    <button class="btn btn-default btn-primary btn-block" onClick="$('#login-content').hide(); $('#signup-content').show();">Sign up</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="signup-content" style="display:none">
-                            <form id="signup-form" class="form-horizontal" role="form">
-
-                                <div id="signupalert" style="display:none" class="alert alert-danger">
-                                    <p>Error:</p>
-                                    <span></span>
-                                </div>
-                                <div class="form-group">
-                                    <label for="email" class="col-md-3 control-label">Email</label>
-                                    <div class="col-md-9">
-                                        <input type="text" class="form-control" name="email" placeholder="Email Address" required>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="login" class="col-md-3 control-label">Login</label>
-                                    <div class="col-md-9">
-                                        <input type="text" class="form-control" name="login" placeholder="Login" required>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="password" class="col-md-3 control-label">Password</label>
-                                    <div class="col-md-9">
-                                        <input type="password" class="form-control" name="passwd" placeholder="Password" required>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="nome" class="col-md-3 control-label">Nome</label>
-                                    <div class="col-md-9">
-                                        <input type="text" class="form-control" name="nome" placeholder="Nome">
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <div class="col-md-offset-5 col-md-4">
-                                        <button id="btn-signup" type="button" class="btn btn-info">Sign up</button>
-                                    </div>
-                                </div>
-                            </form>
-                            <div class="col-md-offset-5">
-                                <button id="login-return" class="btn btn-sm btn-danger" onclick="$('#signup-content').hide(); $('#login-content').show()">Return to login</button>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="row">
-                        <table class="table table-striped">
-                            <caption>Estatisticas</caption>
-                            <thead>
-                                <tr>
-                                    <th>mapas</th>
-                                    <th>total</th>
-                                    <th>online</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>999</td>
-                                    <td>90</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>909</td>
-                                    <td>990</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td>990</td>
-                                    <td>990</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="row">
+                    <table class="table table-striped">
+                        <caption>Estatisticas</caption>
+                        <thead>
+                            <tr>
+                                <th>mapas</th>
+                                <th>total</th>
+                                <th>online</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>999</td>
+                                <td>90</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>909</td>
+                                <td>990</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td>990</td>
+                                <td>990</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </body>
+    </div>
+</body>
 
 </html>
