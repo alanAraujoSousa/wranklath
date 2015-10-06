@@ -1,8 +1,10 @@
 package br.com.engine.business.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -58,5 +60,14 @@ public class UnitService {
 		now.setTime(now.getTime() + moveTime);
 		unitObject.setTimeToNextMove(now);
 		unitObject.getMovementObject().setMoves(places);
+	}
+	
+	public List<UnitObject> listByUser(UserObject userObject) {
+		List<Unit> units = this.unitDAO.listByUser(userObject.getId());
+		List<UnitObject> unitObjects = new ArrayList<>();
+		for (Unit unit : units) {
+			unitObjects.add(unit.generateTransportObject());
+		}
+		return unitObjects;
 	}
 }

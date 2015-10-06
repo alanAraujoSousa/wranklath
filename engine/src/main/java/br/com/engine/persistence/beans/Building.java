@@ -17,6 +17,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import br.com.commons.enums.BuildingTypeEnum;
+import br.com.commons.transport.BuildingObject;
 import br.com.commons.transport.interfaces.TransportObjectInterface;
 
 @Entity
@@ -45,10 +46,11 @@ public class Building implements Serializable, TransportObjectInterface{
 	@Column(name = "type")
 	private Integer type;
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T generateTransportObject() {
-		// TODO Auto-generated method stub
-		return null;
+	public BuildingObject generateTransportObject() {
+		BuildingObject buildingObject = new BuildingObject();
+		return buildingObject;
 	}
 
 	/**

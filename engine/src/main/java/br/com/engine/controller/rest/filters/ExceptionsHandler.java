@@ -21,17 +21,26 @@ public class ExceptionsHandler implements ExceptionMapper<Throwable> {
 	@Override
 	public Response toResponse(Throwable exception) {
 		if (exception instanceof DefaultOptionsMethodException) {
-			return Response.ok().build();
+			return Response
+					.ok()
+//					.header("Access-Control-Allow-Origin", "*")
+//					.header("Access-Control-Allow-Headers",
+//							"origin, content-type, accept, authorization, token")
+//					.header("Access-Control-Allow-Credentials", "true")
+//					.header("Access-Control-Allow-Methods",
+//							"GET, POST, PUT, DELETE, OPTIONS, HEAD")
+//					.header("Access-Control-Max-Age", "1209600")
+					.build();
 		}
-		
-		/**********************FIXME********************************* 
-		 * printStackTrace, don't use for production. instead it 
-		 * use the Logger.
+
+		/**********************
+		 * FIXME********************************* printStackTrace, don't use for
+		 * production. instead it use the Logger.
 		 * **********************************************************/
 		exception.printStackTrace();
-		/**********************FIXME********************************* 
-		 * printStackTrace, don't use for production. instead it 
-		 * use the Logger.
+		/**********************
+		 * FIXME********************************* printStackTrace, don't use for
+		 * production. instead it use the Logger.
 		 * **********************************************************/
 
 		if (exception instanceof WebApplicationException) {

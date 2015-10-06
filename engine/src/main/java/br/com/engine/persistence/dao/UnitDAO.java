@@ -32,6 +32,12 @@ public class UnitDAO extends GenericDAO<Unit> {
 		return getCriteria().list();
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Transactional(propagation=Propagation.REQUIRED, readOnly = true)
+	public List<Unit> listByUser(Long userId) {
+		return getCriteria().add(Restrictions.eq("user.id", userId)).list();
+	}
+	
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public void editPlace(Unit unit, Place place) {
 		unit.setPlace(place);

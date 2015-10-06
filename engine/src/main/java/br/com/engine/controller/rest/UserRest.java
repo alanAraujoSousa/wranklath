@@ -21,7 +21,11 @@ import org.springframework.stereotype.Component;
 
 import br.com.commons.annotations.Authorize;
 import br.com.commons.enums.PermissionEnum;
+import br.com.commons.transport.BuildingObject;
+import br.com.commons.transport.UnitObject;
 import br.com.commons.transport.UserObject;
+import br.com.engine.business.service.BuildingService;
+import br.com.engine.business.service.UnitService;
 import br.com.engine.business.service.UserService;
 
 @Component
@@ -31,6 +35,12 @@ public class UserRest {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private UnitService unitService;
+	
+	@Autowired
+	private BuildingService buildingService;
 
 	@POST
 	@Path("/login")
@@ -40,7 +50,7 @@ public class UserRest {
 
 		final String token = this.userService.login(user.getLogin(),
 				user.getPassword());
-		return Response.status(Status.OK).entity(token).build();
+		return Response.ok().entity(token).build();
 	}
 
 	@POST
@@ -82,7 +92,39 @@ public class UserRest {
 					new GenericEntity<List<UserObject>>(listUserObject) {
 					}).build();
 		} else {
-			return Response.status(Status.NO_CONTENT).build();
+			return Response.noContent().build();
+		}
+	}
+	
+	@GET
+	@Path("/unit")
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	public Response listAllUnits(@HeaderParam("token") final String token) {
+		
+		UserObject userObject = this.userService.findUserBySessionToken(token);
+		final List<UnitObject> listUserObject = this.unitService.listByUser(userObject);
+		if (!listUserObject.isEmpty()) {
+			return Response.ok(
+					new GenericEntity<List<UnitObject>>(listUserObject) {
+					}).build();
+		} else {
+			return Response.noContent().build();
+		}
+	}
+	
+	@GET
+	@Path("/building")
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	public Response listAllBuildings(@HeaderParam("token") final String token) {
+
+		UserObject userObject = this.userService.findUserBySessionToken(token);
+		final List<BuildingObject> listBuildingObjects = this.buildingService.listByUser(userObject);
+		if (!listBuildingObjects.isEmpty()) {
+			return Response.ok(
+					new GenericEntity<List<BuildingObject>>(listBuildingObjects) {
+					}).build();
+		} else {
+			return Response.noContent().build();
 		}
 	}
 
