@@ -2,6 +2,8 @@ domain = "localhost";
 domainPort = 8080;
 apiRoute = "/wranklath/rest";
 htmlRepo = '/rsrc/html';
+defaultRoute = 'http://' + domain + ':' + domainPort + apiRoute;
+
 restUtil = {
     login: "/user/login",
     logout: "/user/logout",
@@ -10,5 +12,6 @@ restUtil = {
     listBuildings: "/user/unit",
 };
 
-loginRest = 'http://' + domain + ':' + domainPort + apiRoute + restUtil.login;
-listUnits = 'http://' + domain + ':' + domainPort + apiRoute + restUtil.listUnits;
+loginRest = defaultRoute + restUtil.login;
+listUnits = defaultRoute + restUtil.listUnits;
+listBuildings = defaultRoute + restUtil.listBuildings;
