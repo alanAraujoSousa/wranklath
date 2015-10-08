@@ -9,7 +9,7 @@ restUtil = {
     logout: "/user/logout",
     move: "/unit/move",
     listUnits: "/user/unit",
-    listBuildings: "/user/unit",
+    listBuildings: "/user/building",
 };
 
 loginRest = defaultRoute + restUtil.login;
