@@ -22,27 +22,27 @@ import br.com.commons.transport.interfaces.TransportObjectInterface;
 
 @Entity
 @Table(name = "building")
-public class Building implements Serializable, TransportObjectInterface{
+public class Building implements Serializable, TransportObjectInterface {
 
 	private static final long serialVersionUID = 4655810757200542148L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", unique = true)
 	private Long id;
-	
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id")
 	private User user;
-	
+
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "place_id")
 	private Place place;
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable = false)
 	private Date conclusionDate;
-	
+
 	@Column(name = "type")
 	private Integer type;
 
@@ -50,6 +50,11 @@ public class Building implements Serializable, TransportObjectInterface{
 	@Override
 	public BuildingObject generateTransportObject() {
 		BuildingObject buildingObject = new BuildingObject();
+		buildingObject.setId(getId());
+		buildingObject.setPlace(getPlace() != null ? getPlace()
+				.generateTransportObject() : null);
+		buildingObject.setType(getType());
+		buildingObject.setConclusionDate(getConclusionDate());
 		return buildingObject;
 	}
 
@@ -61,7 +66,8 @@ public class Building implements Serializable, TransportObjectInterface{
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(Long id) {
 		this.id = id;
@@ -75,7 +81,8 @@ public class Building implements Serializable, TransportObjectInterface{
 	}
 
 	/**
-	 * @param user the user to set
+	 * @param user
+	 *            the user to set
 	 */
 	public void setUser(User user) {
 		this.user = user;
@@ -89,11 +96,12 @@ public class Building implements Serializable, TransportObjectInterface{
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param type
+	 *            the type to set
 	 */
 	public void setType(BuildingTypeEnum type) {
 		if (type != null) {
-			this.type = type.getId();			
+			this.type = type.getId();
 		}
 	}
 
@@ -105,7 +113,8 @@ public class Building implements Serializable, TransportObjectInterface{
 	}
 
 	/**
-	 * @param place the place to set
+	 * @param place
+	 *            the place to set
 	 */
 	public void setPlace(Place place) {
 		this.place = place;
@@ -119,12 +128,11 @@ public class Building implements Serializable, TransportObjectInterface{
 	}
 
 	/**
-	 * @param conclusionDate the conclusionDate to set
+	 * @param conclusionDate
+	 *            the conclusionDate to set
 	 */
 	public void setConclusionDate(Date conclusionDate) {
 		this.conclusionDate = conclusionDate;
 	}
 
-	
-	
 }
