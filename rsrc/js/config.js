@@ -3,6 +3,7 @@ domainPort = 8080;
 apiRoute = "/wranklath/rest";
 htmlRepo = '/rsrc/html';
 defaultRoute = 'http://' + domain + ':' + domainPort + apiRoute;
+gridCellSize = '100';
 
 restUtil = {
     login: "/user/login",
