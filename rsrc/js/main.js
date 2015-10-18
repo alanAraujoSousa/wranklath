@@ -6,6 +6,7 @@ terrains = [];
 world = new Array(2500);
 map = new Object();
 paper = new Object();
+panZoom = new Object();
 
 $(document).ready(function () {
 
@@ -115,7 +116,7 @@ $(document).ready(function () {
 
     function retriveWorldDataChunck(index) {
         var url;
-        url = "./map/map" + index + ".json";
+        url = "../js/map/map" + index + ".json";
         return $.ajax({
             url: url,
             type: 'GET',
@@ -152,59 +153,60 @@ $(document).ready(function () {
     };
 
     function drawLocalMapArround(initX, initY) {
-        debugger;
-        var dataIndex = getIndexWorldDataChunck(initX, initY);
-        var promise = retriveWorldDataChunck(dataIndex);
-        promise.always(function (data) {
-            debugger;
-            world[index] = data;
 
-             for (var x = 1; x <= 100; x++) {
+        var deltaX = initX;
+        var deltaY = initY;
+        if (deltaX % 100 == 0)
+            deltaX--;
+        if (deltaY % 100 == 0)
+            deltaY--;
+        deltaX = deltaX / 100;
+        deltaY = deltaY / 100;
+        deltaX = Number.parseInt(deltaX);
+        deltaY = Number.parseInt(deltaY);
+        var index = 0;
+        index += deltaX * 50;
+        index += deltaY;
+        index++;
+        deltaX *= 100;
+        deltaY *= 100;
+
+        var promise = retriveWorldDataChunck(index);
+        promise.always(function (data) {
+            world[index] = data;
+            debugger;
+
+            for (var x = 1; x <= 100; x++) {
+                var factorX = x + deltaX;
                 for (var y = 1; y <= 100; y++) {
+                    var factorY = y + deltaY;
                     d3.select('#mapGroup').append("rect")
-                        .attr("id", x + ":" + y)
-                        .attr("x", (x - 1) * gridCellSize)
-                        .attr("y", (y - 1) * gridCellSize)
+                        .attr("id", factorX + ":" + factorY)
+                        .attr("x", factorX * gridCellSize)
+                        .attr("y", factorY * gridCellSize)
                         .attr("width", gridCellSize)
                         .attr("height", gridCellSize)
                         .style("stroke-width", "1px")
                         .style("stroke", "black");
                 }
             }
-
-            var paper = map.get(0);
-            paper.set().forEach(function (e, index) {
-                var tileId = e.id;
-                // TODO if Id is part of the map.
-                console.log(index);
-
-                var pieceOfWorld = world[worldIndex];
-                // debugger;
-                var placeData = pieceOfWorld[index];
-
-                var terrain = findTerrain(initX, initY);
-
-                e.attr({
-                    fill: '#000'
-                });
-            });
         });
-        terrainSpriteSheet.src = "../img/sprites/map/map1.jpg";
     };
 
-    // TODO validate this function.
     function getIndexWorldDataChunck(initX, initY) {
-        if (initX % 100 == 0)
-            initX--;
-        if (initY % 100 == 0)
-            initY--;
-        var x = initX / 100;
-        var y = initY / 100;
-        x = Number.parseInt(x);
-        y = Number.parseInt(y);
+        var deltaX = initX;
+        var deltaY = initY;
+        if (deltaX % 100 == 0)
+            deltaX--;
+        if (deltaY % 100 == 0)
+            deltaY--;
+        deltaX = deltaX / 100;
+        deltaY = deltaY / 100;
+        deltaX = Number.parseInt(deltaX);
+        deltaY = Number.parseInt(deltaY);
         var index = 0;
-        index += x * 50;
-        index += y;
+        index += deltaX * 50;
+        index += deltaY;
         index++;
         return index;
     };
@@ -233,21 +235,23 @@ $(document).ready(function () {
                     terrains.push(ctx.getImageData(j * tileWidth, i * tileHeight, tileWidth, tileHeight));
                 }
             }
-            // Obtain tiles.
-
-            svgPanZoom('#paper', {
-                zoomEnabled: true,
-                fit: false,
-                center: false
-            });
-
             // Get initial position.
             var towns = dataBase.buildings;
             var initialPlace = towns[0].place;
             var initX = initialPlace.x;
             var initY = initialPlace.y;
 
+            // Init pan
+            panZoom = svgPanZoom('#paper', {
+                zoomEnabled: true,
+                fit: false,
+                center: false
+            });
+
             drawLocalMapArround(initX, initY);
-        };
+            // pan to specific point
+
+        }
+        terrainSpriteSheet.src = "../img/sprites/map/map1.jpg";
     };
 });
