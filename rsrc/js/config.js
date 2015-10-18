@@ -2,7 +2,7 @@ domain = "localhost";
 domainPort = 8080;
 apiRoute = "/wranklath/rest";
 htmlRepo = '/rsrc/html';
-defaultRoute = 'http://' + domain + ':' + domainPort + apiRoute;
+defaultRoute = 'http://' + domain + ':' + domainPort;
 gridCellSize = '100';
 
 restUtil = {
@@ -13,6 +13,6 @@ restUtil = {
     listBuildings: "/user/building",
 };
 
-loginRest = defaultRoute + restUtil.login;
-listUnits = defaultRoute + restUtil.listUnits;
-listBuildings = defaultRoute + restUtil.listBuildings;
+loginRest = defaultRoute + apiRoute + restUtil.login;
+listUnits = defaultRoute + apiRoute + restUtil.listUnits;
+listBuildings = defaultRoute + apiRoute + restUtil.listBuildings;
