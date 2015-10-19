@@ -153,15 +153,16 @@ $(document).ready(function () {
         return time;
     };
 
-    function drawLocalMapArround(initX, initY) {
+    function drawMapArround(initX, initY) {
         var info = getInfoWorldDataChunck(initX, initY);
         var index = info.index;
         var deltaX = info.deltaX;
         var deltaY = info.deltaY;
 
-        if (world[index] == null && !(index in poolOfDownloadDataChunck)) {
+        if (world[index] == null && poolOfDownloadDataChunck.indexOf(index) < 0) {
             console.log("Loading map chunck: " + index);
             poolOfDownloadDataChunck.push(index);
+
             var promise = retriveWorldDataChunck(index);
             promise.always(function (data) {
                 var cont = poolOfDownloadDataChunck.indexOf(index);
@@ -181,6 +182,7 @@ $(document).ready(function () {
                                 .attr("y", factorY * gridCellSize)
                                 .attr("width", gridCellSize)
                                 .attr("height", gridCellSize)
+                                .attr("fill", getTile(world[index][x - 1][y - 1])) // ohhay!
                                 .style("stroke-width", "1px")
                                 .style("stroke", "black");
                         }
@@ -215,6 +217,11 @@ $(document).ready(function () {
         return info;
     };
 
+    function getTile(code) {
+        //some calc;
+        return "url(#grassland)";
+    };
+
     function findTerrain(code) {
         // some calc;
         return terrains[12];
@@ -235,15 +242,14 @@ $(document).ready(function () {
                 if (y < 0)
                     y *= -1;
 
-                drawLocalMapArround(x, y + 50);
-                drawLocalMapArround(x, y - 50);
-                drawLocalMapArround(x + 50, y);
-                drawLocalMapArround(x + 50, y + 50);
-                drawLocalMapArround(x + 50, y - 50);
-                drawLocalMapArround(x - 50, y);
-                drawLocalMapArround(x - 50, y - 50);
-                drawLocalMapArround(x - 50, y - 50);
-
+                drawMapArround(x, y + 50);
+                drawMapArround(x, y - 50);
+                drawMapArround(x + 50, y);
+                drawMapArround(x + 50, y + 50);
+                drawMapArround(x + 50, y - 50);
+                drawMapArround(x - 50, y);
+                drawMapArround(x - 50, y - 50);
+                drawMapArround(x - 50, y - 50);
             }, 1000);
     }
 
@@ -274,12 +280,12 @@ $(document).ready(function () {
 
             // Init pan
             panZoom = svgPanZoom('#paper', {
-                zoomEnabled: true,
+                zoomEnabled: false,
                 fit: false,
                 center: false
             });
 
-            drawLocalMapArround(initX, initY);
+            drawMapArround(initX, initY);
 
             // pan to specific point
             panZoom.pan({
