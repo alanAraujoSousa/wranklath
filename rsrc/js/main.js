@@ -4,7 +4,7 @@ dataBase.units = [];
 
 terrains = [];
 world = new Array(2500);
-poolOfDownloadDataChunck = new Array();
+queueDownloadMapChunck = new Array();
 map = new Object();
 paper = new Object();
 panZoom = new Object();
@@ -115,7 +115,7 @@ $(document).ready(function () {
         });
     };
 
-    function retriveWorldDataChunck(index) {
+    function downloadMapDataChunck(index) {
         var url;
         url = "../js/map/map" + index + ".json";
         return $.ajax({
@@ -154,48 +154,53 @@ $(document).ready(function () {
     };
 
     function drawMapArround(initX, initY) {
-        var info = getInfoWorldDataChunck(initX, initY);
+        var info = getInfoMapChunck(initX, initY);
         var index = info.index;
         var deltaX = info.deltaX;
         var deltaY = info.deltaY;
 
-        if (world[index] == null && poolOfDownloadDataChunck.indexOf(index) < 0) {
-            console.log("Loading map chunck: " + index);
-            poolOfDownloadDataChunck.push(index);
+        if (world[index] != null) {
+            paint(index, deltaX, deltaY);
+        }
 
-            var promise = retriveWorldDataChunck(index);
-            promise.always(function (data) {
-                var cont = poolOfDownloadDataChunck.indexOf(index);
-                poolOfDownloadDataChunck.splice(cont, 1);
+        if (world[index] == null && queueDownloadMapChunck.indexOf(index) < 0) {
+            console.log("Downloading map chunck: " + index);
+            queueDownloadMapChunck.push(index);
+            // promise
+            downloadMapDataChunck(index).always(function (data) {
+                //remove download of queue
+                queueDownloadMapChunck.splice(queueDownloadMapChunck.indexOf(index), 1);
                 world[index] = data;
-
-                var isPainted = d3.select("#map" + index)[0][0] != null;
-                if (!isPainted) { // if this chunck is already painted.
-                    var group = d3.select('#mapGroup').append("g").attr("id", "map" + index);
-                    for (var x = 1; x <= 100; x++) {
-                        var factorX = x + deltaX;
-                        for (var y = 1; y <= 100; y++) {
-                            var factorY = y + deltaY;
-                            group.append("rect")
-                                .attr("id", "x" + factorX + "y" + factorY)
-                                .attr("x", factorX * gridCellSize)
-                                .attr("y", factorY * gridCellSize)
-                                .attr("width", gridCellSize)
-                                .attr("height", gridCellSize)
-                                .attr("fill", getTile(world[index][x - 1][y - 1])) // ohhay!
-                                .style("stroke-width", "1px")
-                                .style("stroke", "black");
-                        }
-                    }
-                } else {
-                    console.warn("Tried to duplicate on screen the map: " + index);
-                }
+                paint(index, deltaX, deltaY);
             });
+        }
+
+        function paint(index, deltaX, deltaY) {
+            var isPainted = d3.select("#map" + index)[0][0] != null;
+            if (!isPainted) { // if this chunck is already painted.
+                var group = d3.select('#mapGroup').append("g").attr("id", "map" + index);
+                for (var x = 1; x <= 100; x++) {
+                    var factorX = x + deltaX;
+                    for (var y = 1; y <= 100; y++) {
+                        var factorY = y + deltaY;
+                        group.append("rect")
+                            .attr("id", "x" + factorX + "y" + factorY)
+                            .attr("x", factorX * gridCellSize)
+                            .attr("y", factorY * gridCellSize)
+                            .attr("width", gridCellSize)
+                            .attr("height", gridCellSize)
+                            .attr("fill", getTerrain(world[index][x - 1][y - 1])) // ohhay!
+                            .style("stroke-width", "1px")
+                            .style("stroke", "black");
+                    }
+                }
+            } else {
+                console.warn("Tried to duplicate on screen the map: " + index);
+            }
         }
     };
 
-    // this is for test
-    function getInfoWorldDataChunck(initX, initY) {
+    function getInfoMapChunck(initX, initY) {
         var deltaX = initX;
         var deltaY = initY;
         if (deltaX % 100 == 0)
@@ -217,9 +222,37 @@ $(document).ready(function () {
         return info;
     };
 
-    function getTile(code) {
-        //some calc;
-        return "url(#grassland)";
+    function getBuildings(code) {
+        switch (code) {
+            case 943213:
+                return "url(#town)";
+            case 194234:
+                return "url(#barracks)";
+        }
+    }
+
+    function getUnit(code) {
+        switch (code) {
+            case 422322:
+                return "url(#cavalary)";
+            case 392333:
+                return "url(#infantry)";
+            case 202356:
+                return "url(#archer)";
+        }
+    }
+
+    function getTerrain(code) {
+        switch (code) {
+            case 1:
+                return "url(#grassland)";
+            case 2:
+                return "url(#road)";
+            case 3:
+                return "url(#forest)";
+            case 4:
+                return "url(#water)";
+        }
     };
 
     function findTerrain(code) {
@@ -254,47 +287,28 @@ $(document).ready(function () {
     }
 
     function generateInitialMap() {
+        // Get initial position.
+        var towns = dataBase.buildings;
+        var initialPlace = towns[0].place;
+        var initX = initialPlace.x;
+        var initY = initialPlace.y;
 
-        // Obtain tiles of terrains.
-        var tileWidth = 32;
-        var tileHeight = 32;
-        var ctx = $('<canvas>').css("display", "none").appendTo('body')[0].getContext("2d");
-        var terrainSpriteSheet = new Image();
-        terrainSpriteSheet.onload = function () {
-            var imageWidth = terrainSpriteSheet.width;
-            var imageHeight = terrainSpriteSheet.height;
-            ctx.drawImage(terrainSpriteSheet, 0, 0);
-            var tilesX = imageWidth / tileWidth;
-            var tilesY = imageHeight / tileHeight;
-            var totalTiles = tilesX * tilesY;
-            for (var i = 0; i < tilesY; i++) {
-                for (var j = 0; j < tilesX; j++) {
-                    terrains.push(ctx.getImageData(j * tileWidth, i * tileHeight, tileWidth, tileHeight));
-                }
-            }
-            // Get initial position.
-            var towns = dataBase.buildings;
-            var initialPlace = towns[0].place;
-            var initX = initialPlace.x;
-            var initY = initialPlace.y;
+        // Init pan
+        panZoom = svgPanZoom('#paper', {
+            zoomEnabled: false,
+            fit: false,
+            center: false
+        });
 
-            // Init pan
-            panZoom = svgPanZoom('#paper', {
-                zoomEnabled: false,
-                fit: false,
-                center: false
-            });
+        drawMapArround(initX, initY);
 
-            drawMapArround(initX, initY);
+        // pan to specific point
+        // TODO put initial coordinates on center of map.
+        panZoom.pan({
+            x: initX * gridCellSize * -1,
+            y: initY * gridCellSize * -1
+        });
 
-            // pan to specific point
-            panZoom.pan({
-                x: initX * gridCellSize * -1,
-                y: initY * gridCellSize * -1
-            });
-
-            stalkEmptyTiles();
-        }
-        terrainSpriteSheet.src = "../img/sprites/map/tileset.png";
+        stalkEmptyTiles();
     };
 });
