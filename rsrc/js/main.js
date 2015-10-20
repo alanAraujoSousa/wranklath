@@ -123,7 +123,7 @@ $(document).ready(function () {
             type: 'GET',
             dataType: 'json',
         });
-    }
+    };
 
     function loginAjax(userObject) {
         return $.ajax({
@@ -153,7 +153,22 @@ $(document).ready(function () {
         return time;
     };
 
-    function drawMapArround(initX, initY) {
+    function drawUnit(unit) {
+        var x = unit.place.x;
+        var y = unit.place.y;
+        var id = unit.id;
+        var place = d3.select("#x" + x + "y" + y)[0][0];
+        var unitDrawed = d3.select("#unitID" + id)[0][0];
+        if (unitDrawed != null) {
+            // delete, or move to new place.
+        }
+        place.append("rect")
+            .attr("#unitID", unit.id);
+            .attr("type", unit.type);
+
+    };
+
+    function drawMap(initX, initY) {
         var info = getInfoMapChunck(initX, initY);
         var index = info.index;
         var deltaX = info.deltaX;
@@ -194,8 +209,6 @@ $(document).ready(function () {
                             .style("stroke", "black");
                     }
                 }
-            } else {
-                console.warn("Tried to duplicate on screen the map: " + index);
             }
         }
     };
@@ -255,12 +268,15 @@ $(document).ready(function () {
         }
     };
 
-    function findTerrain(code) {
-        // some calc;
-        return terrains[12];
+    function stalkUserVisibility() {
+        setInterval(
+            function () {
+
+            }, 300); // it's too fast babe.
     };
 
-    function stalkEmptyTiles() {
+
+    function stalkEntities() {
         setInterval(
             function () {
                 var x = panZoom.getPan().x;
@@ -275,16 +291,34 @@ $(document).ready(function () {
                 if (y < 0)
                     y *= -1;
 
-                drawMapArround(x, y + 50);
-                drawMapArround(x, y - 50);
-                drawMapArround(x + 50, y);
-                drawMapArround(x + 50, y + 50);
-                drawMapArround(x + 50, y - 50);
-                drawMapArround(x - 50, y);
-                drawMapArround(x - 50, y - 50);
-                drawMapArround(x - 50, y - 50);
+                drawMapVisible(x, y);
+                drwaUnitVisible(x, y);
             }, 1000);
-    }
+    };
+
+    function drawUnitVisible(x, y) {
+        var range = 30;
+        var units = dataBase.units;
+        for (var i = 0; i < units.length; i++) {
+            var unit = units[i];
+            var locX = cunit.place.x;
+            var locY = unit.place.y;
+            if (((x - range) <= locX && (x + range) >= locX) &&
+                ((y - range) <= locY && (y + range) >= locY))
+                drawUnit(unit);
+        }
+    };
+
+    function drawMapVisible(x, y) {
+        drawMap(x, y + 50);
+        drawMap(x, y - 50);
+        drawMap(x + 50, y);
+        drawMap(x + 50, y + 50);
+        drawMap(x + 50, y - 50);
+        drawMap(x - 50, y);
+        drawMap(x - 50, y - 50);
+        drawMap(x - 50, y - 50);
+    };
 
     function generateInitialMap() {
         // Get initial position.
@@ -300,7 +334,8 @@ $(document).ready(function () {
             center: false
         });
 
-        drawMapArround(initX, initY);
+        drawMapVisible(initX, initY);
+        drawUnitVisible(initX, initY);
 
         // pan to specific point
         // TODO put initial coordinates on center of map.
@@ -309,6 +344,6 @@ $(document).ready(function () {
             y: initY * gridCellSize * -1
         });
 
-        stalkEmptyTiles();
+        stalkEntities();
     };
 });
