@@ -1,4 +1,5 @@
 dataBase = new Object();
+dataBase.user.userLogin;
 dataBase.user.buildings = [];
 dataBase.user.units = [];
 dataBase.enemy.buildings = [];
@@ -75,6 +76,7 @@ $(document).ready(function () {
         user.password = pass;
         var promiseLogin = loginAjax(user);
         promiseLogin.always(function (data) {
+            dataBase.user.login = login;
             document.cookie = "token=" + data.responseText;
             window.location.hash = "main";
         });
@@ -160,11 +162,17 @@ $(document).ready(function () {
         var x = unit.place.x;
         var y = unit.place.y;
         var id = unit.id;
-        d3.select("#unitID" + id).remove();
-        /* var unitDrawed = d3.select("#unitID" + id).[0][0];
-         if (unitDrawed != null) {
-             unitDrawed.remove();
-         }*/
+        var login = unit.userLogin;
+        if (login != dataBase.user.login) {
+            // Give the unit blue color.
+        } else {
+            // Give the unit red color.
+        }
+
+        var unitDrawed = d3.select("#unitID" + id)[0][0];
+        if (unitDrawed != null) {
+            unitDrawed.remove();
+        }
         var place = d3.select("#x" + x + "y" + y)[0][0];
         place.append("rect")
             .attr("#unitID", unit.id)
@@ -302,8 +310,11 @@ $(document).ready(function () {
     function drawUnitVisible(x, y) {
         var range = 30;
         var units = dataBase.user.units;
-        for (var i = 0; i < units.length; i++) {
-            var unit = units[i];
+        var unitsE = dataBase.enemy.units;
+        var all = new Array();
+        $.merge($.merge(all, units), unitsE);
+        for (var i = 0; i < all.length; i++) {
+            var unit = all[i];
             var targetX = unit.place.x;
             var targetY = unit.place.y;
 
