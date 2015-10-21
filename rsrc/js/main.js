@@ -1,6 +1,8 @@
 dataBase = new Object();
-dataBase.buildings = [];
-dataBase.units = [];
+dataBase.user.buildings = [];
+dataBase.user.units = [];
+dataBase.enemy.buildings = [];
+dataBase.enemy.units = [];
 
 terrains = [];
 world = new Array(2500);
@@ -58,8 +60,8 @@ $(document).ready(function () {
         var promiseUnit = retrieveUnitData();
 
         $.when(promiseBuild, promiseUnit).done(function (towns, armys) {
-            dataBase.buildings = towns[0];
-            dataBase.units = armys[0];
+            dataBase.user.buildings = towns[0];
+            dataBase.user.units = armys[0];
             generateInitialMap();
         });
     }
@@ -83,8 +85,9 @@ $(document).ready(function () {
         var cookie = document.cookie;
         cookieName += "=";
         var index = cookie.indexOf(cookieName);
-        if (index < 0)
+        if (index < 0) {
             return null;
+        }
         index += cookieName.length;
         cookie += ";";
         cookie = cookie.substr(index);
@@ -157,15 +160,14 @@ $(document).ready(function () {
         var x = unit.place.x;
         var y = unit.place.y;
         var id = unit.id;
-        var place = d3.select("#x" + x + "y" + y)[0][0];
         var unitDrawed = d3.select("#unitID" + id)[0][0];
         if (unitDrawed != null) {
-            // delete, or move to new place.
+            // delete.
         }
+        var place = d3.select("#x" + x + "y" + y)[0][0];
         place.append("rect")
-            .attr("#unitID", unit.id);
-            .attr("type", unit.type);
-
+            .attr("#unitID", unit.id)
+            .attr("fill", getUnit(unit.type));
     };
 
     function drawMap(initX, initY) {
@@ -292,19 +294,20 @@ $(document).ready(function () {
                     y *= -1;
 
                 drawMapVisible(x, y);
-                drwaUnitVisible(x, y);
+                drawUnitVisible(x, y);
             }, 1000);
     };
 
     function drawUnitVisible(x, y) {
         var range = 30;
-        var units = dataBase.units;
+        var units = dataBase.user.units;
         for (var i = 0; i < units.length; i++) {
             var unit = units[i];
-            var locX = cunit.place.x;
-            var locY = unit.place.y;
-            if (((x - range) <= locX && (x + range) >= locX) &&
-                ((y - range) <= locY && (y + range) >= locY))
+            var targetX = unit.place.x;
+            var targetY = unit.place.y;
+
+            if (((x - range) <= targetX && (x + range) >= targetX) &&
+                ((y - range) <= targetY && (y + range) >= targetY))
                 drawUnit(unit);
         }
     };
@@ -322,7 +325,7 @@ $(document).ready(function () {
 
     function generateInitialMap() {
         // Get initial position.
-        var towns = dataBase.buildings;
+        var towns = dataBase.user.buildings;
         var initialPlace = towns[0].place;
         var initX = initialPlace.x;
         var initY = initialPlace.y;
