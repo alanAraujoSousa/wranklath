@@ -160,10 +160,11 @@ $(document).ready(function () {
         var x = unit.place.x;
         var y = unit.place.y;
         var id = unit.id;
-        var unitDrawed = d3.select("#unitID" + id)[0][0];
-        if (unitDrawed != null) {
-            // delete.
-        }
+        d3.select("#unitID" + id).remove();
+        /* var unitDrawed = d3.select("#unitID" + id).[0][0];
+         if (unitDrawed != null) {
+             unitDrawed.remove();
+         }*/
         var place = d3.select("#x" + x + "y" + y)[0][0];
         place.append("rect")
             .attr("#unitID", unit.id)
@@ -324,9 +325,21 @@ $(document).ready(function () {
     };
 
     function generateInitialMap() {
+
         // Get initial position.
         var towns = dataBase.user.buildings;
-        var initialPlace = towns[0].place;
+        var initialPlace = {};
+        if (towns.length > 0) {
+            var initialPlace = towns[0].place;
+        } else {
+            var armys = dataBase.user.units;
+            if (armys.length > 0) {
+                var initialPlace = armys[0].place;
+            } else {
+                initialPlace.x = 150; // Random number.
+                initialPlace.y = 150;
+            }
+        }
         var initX = initialPlace.x;
         var initY = initialPlace.y;
 
@@ -340,7 +353,7 @@ $(document).ready(function () {
         drawMapVisible(initX, initY);
         drawUnitVisible(initX, initY);
 
-        // pan to specific point
+        // pan to initial position.
         // TODO put initial coordinates on center of map.
         panZoom.pan({
             x: initX * gridCellSize * -1,
