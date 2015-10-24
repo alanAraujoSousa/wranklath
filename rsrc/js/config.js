@@ -4,6 +4,7 @@ apiRoute = "/wranklath/rest";
 htmlRepo = '/rsrc/html';
 defaultRoute = 'http://' + domain + ':' + domainPort;
 gridCellSize = '100';
+ds = 'd';
 
 restUtil = {
     login: "/user/login",
@@ -11,6 +12,7 @@ restUtil = {
     move: "/unit/move",
     listUnits: "/user/unit",
     listBuildings: "/user/building",
+    allvisible: "/user/allvisible",
 };
 
 loginRest = defaultRoute + apiRoute + restUtil.login;

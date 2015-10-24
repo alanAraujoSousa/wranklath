@@ -17,6 +17,7 @@ panZoom = new Object();
 
 $(document).ready(function () {
 
+
   $(window).on({
     hashchange: function () {
       var hash = window.location.hash;
@@ -103,7 +104,7 @@ $(document).ready(function () {
   function retrieveEntitiesVisible() {
     var token = getCookie("token");
     return $.ajax({
-      url: listEntitiesVisible,
+      url: allvisible,
       type: 'GET',
       headers: {
         'token': token
@@ -165,33 +166,41 @@ $(document).ready(function () {
     return time;
   };
 
-  function drawEntity(entity, ent) {
+  function drawEntity(entity, name) {
     var x = entity.place.x;
     var y = entity.place.y;
     var type = entity.type;
     var id = entity.id;
     var login = entity.userLogin;
-    if (ent == "unit") {
-      ent = "#unitID";
-      type = getUnit(type);
-    } else {
-      ent = "#buildID";
-      type = getBuild(type);
-    }
-
-    if (login != dataBase.user.login) {
-      // Give the unit blue color.
-    } else {
-      // Give the unit red color.
-    }
-    var unitDrawed = d3.select(ent + id)[0][0];
-    if (unitDrawed != null) {
-      unitDrawed.remove();
-    }
     var place = d3.select("#x" + x + "y" + y)[0][0];
-    place.append("rect")
-    .attr(ent, id)
-    .attr("fill", type);
+    if (place != null) { // if place is painted
+      var actualX = place.getAttribute("x");
+      var actualY = place.getAttribute("y");
+      if (actualX != x && actualY != y) {
+        var unitDrawed = d3.select(ent + id)[0][0];
+        if (unitDrawed != null) {
+          unitDrawed.remove();
+        }
+
+        if (name == "unit") {
+          name = "#unitID";
+          type = getUnit(type);
+        } else {
+          name = "#buildID";
+          type = getBuild(type);
+        }
+
+        if (login != dataBase.user.login) {
+          // Give the unit blue color.
+        } else {
+          // Give the unit red color.
+        }
+
+        place.append("rect")
+        .attr("id", name + id)
+        .attr("fill", type);
+      }
+    }
   };
 
   function drawMap(initX, initY) {
@@ -294,17 +303,13 @@ $(document).ready(function () {
     }
   };
 
-  function stalkUserVisibility() {
+  function stalkEntities() {
     setInterval(
       function () {
+        var prom = retrieveEntitiesVisible();
+        prom.always(function(data) {
+          debugger;
 
-      }, 300); // it's too fast babe.
-    };
-
-
-    function stalkEntities() {
-      setInterval(
-        function () {
           var x = panZoom.getPan().x;
           var y = panZoom.getPan().y;
           x = Number.parseInt(x / 100);
@@ -317,98 +322,99 @@ $(document).ready(function () {
           if (y < 0)
           y *= -1;
 
-          drawMapVisible(x, y);
-          drawUnitVisible(x, y);
-        }, 1000);
-      };
+          drawEntitiesVisible(x, y);
+        });
+      }, 5000);
+    };
 
-      function drawEntitiesVisible(initX, initY) {
-        drawBuildVisible(initX, initY);
-        drawUnitVisible(initX, initY);
-      };
+    function drawEntitiesVisible(initX, initY) {
+      drawBuildVisible(initX, initY);
+      drawUnitVisible(initX, initY);
+    };
 
-      // Go horse
-      function drawBuildVisible(x, y) {
-        var range = 30;
-        var buildings = dataBase.user.buildings;
-        var buildingsE = dataBase.enemy.buildings;
-        var all = new Array();
-        $.merge($.merge(all, buildings), buildingsE);
-        for (var i = 0; i < all.length; i++) {
-          var building = all[i];
-          var targetX = building.place.x;
-          var targetY = building.place.y;
+    // Go horse
+    function drawBuildVisible(x, y) {
+      var range = 30;
+      var buildings = dataBase.user.buildings;
+      var buildingsE = dataBase.enemy.buildings;
+      var all = new Array();
+      $.merge($.merge(all, buildings), buildingsE);
+      for (var i = 0; i < all.length; i++) {
+        var building = all[i];
+        var targetX = building.place.x;
+        var targetY = building.place.y;
 
-          if (((x - range) <= targetX && (x + range) >= targetX) &&
-          ((y - range) <= targetY && (y + range) >= targetY))
-          drawEntity(building);
-        }
-      };
+        if (((x - range) <= targetX && (x + range) >= targetX) &&
+        ((y - range) <= targetY && (y + range) >= targetY))
+        drawEntity(building);
+      }
+    };
 
-      function drawUnitVisible(x, y) {
-        var range = 30;
-        var units = dataBase.user.units;
-        var unitsE = dataBase.enemy.units;
-        var all = new Array();
-        $.merge($.merge(all, units), unitsE);
-        for (var i = 0; i < all.length; i++) {
-          var unit = all[i];
-          var targetX = unit.place.x;
-          var targetY = unit.place.y;
+    function drawUnitVisible(x, y) {
+      var range = 30;
+      var units = dataBase.user.units;
+      var unitsE = dataBase.enemy.units;
+      var all = new Array();
+      $.merge($.merge(all, units), unitsE);
+      for (var i = 0; i < all.length; i++) {
+        var unit = all[i];
+        var targetX = unit.place.x;
+        var targetY = unit.place.y;
 
-          if (((x - range) <= targetX && (x + range) >= targetX) &&
-          ((y - range) <= targetY && (y + range) >= targetY))
-          drawEntity(unit);
-        }
-      };
+        if (((x - range) <= targetX && (x + range) >= targetX) &&
+        ((y - range) <= targetY && (y + range) >= targetY))
+        drawEntity(unit);
+      }
+    };
 
-      function drawMapVisible(x, y) {
-        drawMap(x, y + 50);
-        drawMap(x, y - 50);
-        drawMap(x + 50, y);
-        drawMap(x + 50, y + 50);
-        drawMap(x + 50, y - 50);
-        drawMap(x - 50, y);
-        drawMap(x - 50, y - 50);
-        drawMap(x - 50, y - 50);
-      };
+    function drawMapVisible(x, y) {
+      drawMap(x, y + 50);
+      drawMap(x, y - 50);
+      drawMap(x + 50, y);
+      drawMap(x + 50, y + 50);
+      drawMap(x + 50, y - 50);
+      drawMap(x - 50, y);
+      drawMap(x - 50, y - 50);
+      drawMap(x - 50, y - 50);
+    };
 
-      function generateInitialMap() {
+    function generateInitialMap() {
 
-        // Get initial position.
-        var towns = dataBase.user.buildings;
-        var initialPlace = {};
-        if (towns.length > 0) {
-          var initialPlace = towns[0].place;
+      debugger;
+      // Get initial position.
+      var towns = dataBase.user.buildings;
+      var initialPlace = {};
+      if (towns.length > 0) {
+        var initialPlace = towns[0].place;
+      } else {
+        var armys = dataBase.user.units;
+        if (armys.length > 0) {
+          var initialPlace = armys[0].place;
         } else {
-          var armys = dataBase.user.units;
-          if (armys.length > 0) {
-            var initialPlace = armys[0].place;
-          } else {
-            initialPlace.x = 150; // Random number.
-            initialPlace.y = 150;
-          }
+          initialPlace.x = 150; // Random number.
+          initialPlace.y = 150;
         }
-        var initX = initialPlace.x;
-        var initY = initialPlace.y;
+      }
+      var initX = initialPlace.x;
+      var initY = initialPlace.y;
 
-        // Init pan
-        panZoom = svgPanZoom('#paper', {
-          zoomEnabled: false,
-          fit: false,
-          center: false
-        });
+      // Init pan
+      panZoom = svgPanZoom('#paper', {
+        zoomEnabled: false,
+        fit: false,
+        center: false
+      });
 
-        drawMapVisible(initX, initY);
-        drawEntitiesVisible(initX, initY);
+      drawMapVisible(initX, initY);
+      drawEntitiesVisible(initX, initY);
 
-        // pan to initial position.
-        // TODO put initial coordinates on center of map.
-        panZoom.pan({
-          x: initX * gridCellSize * -1,
-          y: initY * gridCellSize * -1
-        });
+      // pan to initial position.
+      // TODO put initial coordinates on center of map.
+      panZoom.pan({
+        x: initX * gridCellSize * -1,
+        y: initY * gridCellSize * -1
+      });
 
-        stalkEntities();
-      };
-    });
+      stalkEntities();
+    };
+  });
