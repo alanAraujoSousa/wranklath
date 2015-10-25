@@ -23,8 +23,9 @@ public class UnitObject {
 	private Date timeToNextMove;
 	private MovementObject movementObject;
 	private CombatObject combatObject;
+	private String userLogin;
 	
-	// FIXME to remove
+	// FIXME to remove or not :s
 	private Long targetId;
 
 	/**
@@ -187,5 +188,19 @@ public class UnitObject {
 	 */
 	public void setCombatObject(CombatObject combatObject) {
 		this.combatObject = combatObject;
+	}
+
+	/**
+	 * @return the userLogin
+	 */
+	public String getUserLogin() {
+		return userLogin;
+	}
+
+	/**
+	 * @param userLogin the userLogin to set
+	 */
+	public void setUserLogin(String userLogin) {
+		this.userLogin = userLogin;
 	}
 }

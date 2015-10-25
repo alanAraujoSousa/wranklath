@@ -7,6 +7,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.log4j.Logger;
 import org.jboss.resteasy.spi.DefaultOptionsMethodException;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +19,12 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 @Provider
 public class ExceptionsHandler implements ExceptionMapper<Throwable> {
 
+	private static final Logger LOGGER = Logger.getLogger(ExceptionsHandler.class);
+
 	@Override
 	public Response toResponse(Throwable exception) {
 		if (exception instanceof DefaultOptionsMethodException) {
+			LOGGER.debug("options");
 			return Response.ok().build();
 		}
 

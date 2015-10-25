@@ -97,6 +97,22 @@ public class UserRest {
 	}
 	
 	@GET
+	@Path("/allvisible")
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	public Response listAllVisible(@HeaderParam("token") String token) {
+		UserObject userObject = this.userService.findUserBySessionToken(token);
+		List<Object> unitsAndBuildings = this.userService.listAllVisible(userObject);
+		
+		if (!unitsAndBuildings.isEmpty()) {
+			return Response.ok(
+					new GenericEntity<List<Object>>(unitsAndBuildings) {
+					}).build();
+		} else {
+			return Response.noContent().build();
+		}
+	}
+	
+	@GET
 	@Path("/unit")
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response listAllUnits(@HeaderParam("token") final String token) {

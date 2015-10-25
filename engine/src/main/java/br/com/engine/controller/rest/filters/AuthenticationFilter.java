@@ -20,39 +20,38 @@ import br.com.engine.persistence.cache.SessionCache;
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter implements ContainerRequestFilter {
 
-	private static final Logger LOGGER = Logger.getLogger(AuthenticationFilter.class);
-	
-	private static final String TOKEN_PROPERTY = "token";
-	
-	@Override
-	public void filter(ContainerRequestContext requestContext) throws IOException {
-		
-		// When HttpMethod comes as OPTIONS, just acknowledge that it accepts.
-        if ( requestContext.getMethod().equalsIgnoreCase( "OPTIONS" ) ) {
-            LOGGER.info( "HTTP Method (OPTIONS) - Detected!" );
-            return;
-        }
-        
-        String uri = requestContext.getUriInfo().getPath();
-        if (uri.endsWith("login")) {
-        	return;
-		}
-        
-        LOGGER.info("Authentication request for: " + uri);
+	private static final Logger LOGGER = Logger
+			.getLogger(AuthenticationFilter.class);
 
-		String token = requestContext.getHeaders().get(TOKEN_PROPERTY).get(0);;
+	private static final String TOKEN_PROPERTY = "token";
+
+	@Override
+	public void filter(ContainerRequestContext requestContext)
+			throws IOException {
+
+		String uri = requestContext.getUriInfo().getPath();
+		if (uri.endsWith("login")) {
+			return;
+		}
+
+		LOGGER.info("Authentication request for: " + uri);
+
+		String token = requestContext.getHeaders().get(TOKEN_PROPERTY).get(0);
+		
 		if (token == null || token.isEmpty()) {
 			LOGGER.error("Route: " + uri + " token null or empty.");
 			throw new InvalidTokenException("Token null or empty.");
 		}
-		
+
 		/*
-		 * TODO
-		 * Implement get session by token and ip that created it.
+		 * TODO Implement get session by token and ip that created it.
 		 */
-		SessionObject session = SessionCache.getInstance().findSessionByToken(token);
+		SessionObject session = SessionCache.getInstance().findSessionByToken(
+				token);
 		if (session == null) {
-			throw new InvalidTokenException("Token don't have a valid session.");
+
+			throw new InvalidTokenException("Token: " + token
+					+ " don't have a valid session.");
 		}
 	}
 }

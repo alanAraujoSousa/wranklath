@@ -17,7 +17,7 @@ public class PlaceDAO extends GenericDAO<Place> {
 	}
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
 	public Place findByCoordinates(Integer x, Integer y) {
-		return (Place) this.getCriteria().add(Restrictions.eq("id", (long) (((x - 1) * Utils.MAP_SIZE) + y)))
+		return (Place) this.getCriteria().add(Restrictions.eq("id", Utils.convertCoordinateToId(x, y)))
 				.uniqueResult();
 	}
 }

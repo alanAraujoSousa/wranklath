@@ -16,6 +16,7 @@ public class BuildingObject {
 	private Date conclusionDate;
 	private Integer type;
 	private PlaceObject place;
+	private String userLogin;
 
 	/**
 	 * @return the id
@@ -76,5 +77,19 @@ public class BuildingObject {
 	 */
 	public void setPlace(PlaceObject place) {
 		this.place = place;
+	}
+
+	/**
+	 * @return the userLogin
+	 */
+	public String getUserLogin() {
+		return userLogin;
+	}
+
+	/**
+	 * @param userLogin the userLogin to set
+	 */
+	public void setUserLogin(String userLogin) {
+		this.userLogin = userLogin;
 	}
 }

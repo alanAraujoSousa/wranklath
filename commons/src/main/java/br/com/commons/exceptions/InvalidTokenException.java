@@ -36,6 +36,6 @@ public class InvalidTokenException extends RuntimeException implements
 
 	@Override
 	public Integer getStatusCode() {
-		return 405;
+		return 401;
 	}
 }

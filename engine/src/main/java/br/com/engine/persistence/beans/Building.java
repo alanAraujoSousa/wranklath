@@ -55,6 +55,7 @@ public class Building implements Serializable, TransportObjectInterface {
 				.generateTransportObject() : null);
 		buildingObject.setType(getType());
 		buildingObject.setConclusionDate(getConclusionDate());
+		buildingObject.setUserLogin(getUser().getLogin());
 		return buildingObject;
 	}
 

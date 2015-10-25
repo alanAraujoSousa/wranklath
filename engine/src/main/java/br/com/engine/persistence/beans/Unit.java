@@ -50,6 +50,7 @@ public class Unit implements Serializable, TransportObjectInterface {
 				.generateTransportObject() : null);
 		unitObject.setQuantity(getQuantity());
 		unitObject.setType(getType());
+		unitObject.setUserLogin(getUser().getLogin());
 		return unitObject;
 	}
 

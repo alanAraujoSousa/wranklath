@@ -1,10 +1,12 @@
 package br.com.commons.enums;
 
 public enum PlaceTypeEnum {
-	WATER(923313, "water", false), 
-	IMPASSIBLE(923313, "impassable", false), 
-	FOREST(530013, "forest", true), 
-	ROAD(530013, "road", true), ;
+	IMPASSIBLE(5, "impassable", false), 
+	WATER(4, "water", false), 
+	FOREST(3, "forest", true), 
+	ROAD(2, "road", true), 
+	GRASSLAND(1, "grassland", true),
+	;
 
 	private Integer id;
 	private String name;
