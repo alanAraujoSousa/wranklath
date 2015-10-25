@@ -46,6 +46,16 @@
                     <image xlink:href="../img/sprites/units/units.jpg" x="0" y="0" width="425" height="388"></image>
                 </pattern>
 
+                <!-- filters -->
+                <filter id="visible">
+                    <feComponentTransfer>
+                        <feFuncA type="table" tableValues="0 0.5" />
+                    </feComponentTransfer>
+                </filter>
+                <filter id="enemy">
+                    <feColorMatrix type="hueRotate" values="180" />
+                </filter>
+
             </defs>
             <g id="mapGroup" fill="none">
             </g>
