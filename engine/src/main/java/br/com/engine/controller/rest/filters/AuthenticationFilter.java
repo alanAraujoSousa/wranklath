@@ -1,6 +1,8 @@
 package br.com.engine.controller.rest.filters;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -37,7 +39,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		LOGGER.info("Authentication request for: " + uri);
 
 		String token = requestContext.getHeaders().get(TOKEN_PROPERTY).get(0);
-		
+
 		if (token == null || token.isEmpty()) {
 			LOGGER.error("Route: " + uri + " token null or empty.");
 			throw new InvalidTokenException("Token null or empty.");
@@ -49,9 +51,13 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 		SessionObject session = SessionCache.getInstance().findSessionByToken(
 				token);
 		if (session == null) {
-
 			throw new InvalidTokenException("Token: " + token
 					+ " don't have a valid session.");
 		}
+		// Add 10minutes for session.
+		final Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.MINUTE, SessionCache.DEFAULT_EXPIRATION);
+		final Date expirationDate = calendar.getTime();
+		session.setExpirationDate(expirationDate);
 	}
 }
