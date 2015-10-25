@@ -104,7 +104,7 @@ $(document).ready(function () {
   function retrieveEntitiesVisible() {
     var token = getCookie("token");
     return $.ajax({
-      url: allvisible,
+      url: allVisible,
       type: 'GET',
       headers: {
         'token': token
@@ -172,35 +172,40 @@ $(document).ready(function () {
     var type = entity.type;
     var id = entity.id;
     var login = entity.userLogin;
-    var place = d3.select("#x" + x + "y" + y)[0][0];
-    if (place != null) { // if place is painted
-      var actualX = place.getAttribute("x");
-      var actualY = place.getAttribute("y");
-      if (actualX != x && actualY != y) {
-        var unitDrawed = d3.select(ent + id)[0][0];
-        if (unitDrawed != null) {
-          unitDrawed.remove();
-        }
 
-        if (name == "unit") {
-          name = "#unitID";
-          type = getUnit(type);
+    var d3Element = d3.select("#" + name + id);
+    var elementDrawed = d3Element[0][0];
+    if (elementDrawed != null) {
+        var actualX = elementDrawed.getAttribute("x") / gridCellSize;
+        var actualY = elementDrawed.getAttribute("y") / gridCellSize;
+
+        if (actualX == x && actualY == y){
+            return;
         } else {
-          name = "#buildID";
-          type = getBuild(type);
+            d3Element.remove();
         }
-
-        if (login != dataBase.user.login) {
-          // Give the unit blue color.
-        } else {
-          // Give the unit red color.
-        }
-
-        place.append("rect")
-        .attr("id", name + id)
-        .attr("fill", type);
-      }
     }
+
+    if (name == "unit") {
+        type = getUnit(type);
+    } else {
+        type = getBuild(type);
+    }
+
+    if (login != dataBase.user.login) {
+          // Give the unit blue color.
+    } else {
+          // Give the unit red color.
+    }
+
+    var group = d3.select("#" + name + "Group")
+        .append("rect")
+        .attr("id", name + id)
+        .attr("x", x * gridCellSize)
+        .attr("y", y * gridCellSize)
+        .attr("width", gridCellSize)
+        .attr("height", gridCellSize)
+        .attr("fill", type);
   };
 
   function drawMap(initX, initY) {
@@ -308,8 +313,6 @@ $(document).ready(function () {
       function () {
         var prom = retrieveEntitiesVisible();
         prom.always(function(data) {
-          debugger;
-
           var x = panZoom.getPan().x;
           var y = panZoom.getPan().y;
           x = Number.parseInt(x / 100);
@@ -346,10 +349,11 @@ $(document).ready(function () {
 
         if (((x - range) <= targetX && (x + range) >= targetX) &&
         ((y - range) <= targetY && (y + range) >= targetY))
-        drawEntity(building);
+            drawEntity(building, "building");
       }
     };
 
+    // Go go horse
     function drawUnitVisible(x, y) {
       var range = 30;
       var units = dataBase.user.units;
@@ -363,7 +367,7 @@ $(document).ready(function () {
 
         if (((x - range) <= targetX && (x + range) >= targetX) &&
         ((y - range) <= targetY && (y + range) >= targetY))
-        drawEntity(unit);
+            drawEntity(unit, "unit");
       }
     };
 
@@ -380,7 +384,6 @@ $(document).ready(function () {
 
     function generateInitialMap() {
 
-      debugger;
       // Get initial position.
       var towns = dataBase.user.buildings;
       var initialPlace = {};

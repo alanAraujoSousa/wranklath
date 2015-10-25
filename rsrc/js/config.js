@@ -12,9 +12,10 @@ restUtil = {
     move: "/unit/move",
     listUnits: "/user/unit",
     listBuildings: "/user/building",
-    allvisible: "/user/allvisible",
+    allVisible: "/user/allvisible"
 };
 
 loginRest = defaultRoute + apiRoute + restUtil.login;
 listUnits = defaultRoute + apiRoute + restUtil.listUnits;
 listBuildings = defaultRoute + apiRoute + restUtil.listBuildings;
+allVisible = defaultRoute + apiRoute + restUtil.allVisible;
