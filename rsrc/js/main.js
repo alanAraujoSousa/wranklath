@@ -309,15 +309,19 @@ $(document).ready(function () {
             function () {
                 var prom = retrieveEntitiesVisible();
                 prom.always(function (data) {
-                    if (data.length > 0) {
+                    dataBase.enemy.units = [];
+                    dataBase.enemy.buildings = [];
+                    if (data != null && data.length > 0) {
                         for (var i = 0; i < data.length; i++) {
                             var el = data[i];
                             // FIXME find another way to differ builds and units.
-                            if (el.conclusionDate == null) {
-                                dataBase.enemy.units.push(el);
-                            } else {
-                                dataBase.enemy.buildings.push(el);
-                            }
+                            var a;
+                            if (el.conclusionDate == null)
+                                a = dataBase.enemy.units;
+                            else
+                                a = dataBase.enemy.buildings;
+
+                            a.push(el);
                         }
                     }
                     var x = panZoom.getPan().x;
