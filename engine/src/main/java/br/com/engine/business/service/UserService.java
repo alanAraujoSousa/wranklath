@@ -238,6 +238,7 @@ public class UserService {
 		List<Object> list = new ArrayList<Object>();
 		list.addAll(unitObjects);
 		list.addAll(buildingsObjects);
+		
 		return list;
 	}
 

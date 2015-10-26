@@ -20,4 +20,9 @@ public class PlaceDAO extends GenericDAO<Place> {
 		return (Place) this.getCriteria().add(Restrictions.eq("id", Utils.convertCoordinateToId(x, y)))
 				.uniqueResult();
 	}
+	
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public void update(Place place) {
+		super.update(place);
+	}
 }

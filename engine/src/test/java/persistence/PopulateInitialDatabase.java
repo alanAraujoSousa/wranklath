@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.commons.enums.BuildingTypeEnum;
 import br.com.commons.enums.PermissionEnum;
+import br.com.commons.enums.PlaceTypeEnum;
 import br.com.commons.enums.UnitTypeEnum;
 import br.com.commons.transport.BuildingObject;
 import br.com.commons.transport.PermissionObject;
@@ -24,8 +26,10 @@ import br.com.commons.transport.UserGroupObject;
 import br.com.commons.transport.UserObject;
 import br.com.commons.utils.CryptUtil;
 import br.com.commons.utils.Utils;
+import br.com.engine.persistence.beans.Building;
 import br.com.engine.persistence.beans.Permission;
 import br.com.engine.persistence.beans.Place;
+import br.com.engine.persistence.beans.Unit;
 import br.com.engine.persistence.beans.User;
 import br.com.engine.persistence.beans.UserGroup;
 import br.com.engine.persistence.core.HibernateUtil;
@@ -46,7 +50,7 @@ public class PopulateInitialDatabase {
 
 	@Autowired
 	private UserGroupDAO userGroupDAO;
-	
+
 	@Autowired
 	private BuildingDAO buildingDAO;
 
@@ -55,51 +59,52 @@ public class PopulateInitialDatabase {
 
 	@Autowired
 	private PermissionDAO permissionDAO;
-	
+
 	@Autowired
 	private PlaceDAO placeDAO;
-	
+
+
 	@Test
 	@Rollback(false)
 	public void populeDatabase() throws Exception {
 		// +++++++++++++++++__WARNING__++++++++++++++++++
-		// Heavy database operation.
+		// Heavy metal database operation from hell.
 
-//		 saveMap();
+		// saveMap();
 
-		// Heavy database operation.
+		// Heavy metal database operation from hell.
 		// +++++++++++++++++__WARNING__++++++++++++++++++
-
-		saveAllPermissions();
-		saveAllGroups();
-		saveAllUser();
-		saveAllTowns();
-		saveAllArmys();
-		assignPermissionToGroups();
-		assignPermissionToUsers();
+		
+		 saveAllPermissions();
+		 saveAllGroups();
+		 saveAllUser();
+		 saveAllTowns();
+		 saveAllArmys();
+		 assignPermissionToGroups();
+		 assignPermissionToUsers();
 	}
 
 	private void saveMap() {
 		Date startDateOfBatchProcess = new Date();
-		
+
 		for (int x = 1; x <= Utils.MAP_SIZE; x++) {
 			System.out.println("Commiting x: " + x + " fill 1000 Y's.");
 			for (int y = 1; y <= Utils.MAP_SIZE; y++) {
 				Place place = new Place(x, y);
+				place.setType(PlaceTypeEnum.GRASSLAND);
 				HibernateUtil.getInstance().currentSession().save(place);
 			}
 			HibernateUtil.getInstance().currentSession().flush();
 			HibernateUtil.getInstance().currentSession().clear();
 		}
 		Date endDateOfBatchProcess = new Date();
-		System.out
-				.println("Time spent (in minutes) with batch processing: "
-						+ ((endDateOfBatchProcess.getTime() - startDateOfBatchProcess
-								.getTime()) / 60000));
+		System.out.println("Time spent (in minutes) with batch processing: "
+				+ ((endDateOfBatchProcess.getTime() - startDateOfBatchProcess
+						.getTime()) / 60000));
 	}
 
 	private List<User> saveAllUser() throws Exception {
-		
+
 		List<UserGroup> listGroups = this.userGroupDAO.list();
 
 		List<User> users = new ArrayList<>();
@@ -153,27 +158,33 @@ public class PopulateInitialDatabase {
 		List<User> allUsers = this.userDAO.list();
 		Date now = new Date();
 		int randomCoordinate = 300;
-		for (User user : allUsers) {
-			BuildingObject buildingObject = new BuildingObject();
-			buildingObject.setConclusionDate(now);
-			buildingObject.setType(BuildingTypeEnum.TOWN);
-			Place place = this.placeDAO.findByCoordinates(randomCoordinate, randomCoordinate);
-			this.buildingDAO.create(buildingObject, user, place);
-			randomCoordinate += 30;
+		for (User user : allUsers) { // 4 towns
+			for (int i = 0; i < 4; i++) {
+				BuildingObject buildingObject = new BuildingObject();
+				buildingObject.setConclusionDate(now);
+				buildingObject.setType(BuildingTypeEnum.TOWN);
+				Place place = this.placeDAO.findByCoordinates(randomCoordinate,
+						randomCoordinate);
+				this.buildingDAO.create(buildingObject, user, place);
+				randomCoordinate += 2;
+			}
 		}
 	}
-	
+
 	private void saveAllArmys() {
 		List<User> allUsers = this.userDAO.list();
-		int randomCoordinate = 50;
+		int randomCoordinate = 301;
 		UnitTypeEnum[] values = UnitTypeEnum.values();
 		for (User user : allUsers) {
-			UnitObject unitObject = new UnitObject();
-			unitObject.setType(values[new Random().nextInt(3)]);
-			unitObject.setQuantity(30);
-			Place place = this.placeDAO.findByCoordinates(randomCoordinate, randomCoordinate);
-			unitDAO.create(unitObject, user, place);
-			randomCoordinate += 30;
+			for (int i = 0; i < 4; i++) {
+				UnitObject unitObject = new UnitObject();
+				unitObject.setType(values[new Random().nextInt(3)]);
+				unitObject.setQuantity(30);
+				Place place = this.placeDAO.findByCoordinates(randomCoordinate,
+						randomCoordinate);
+				unitDAO.create(unitObject, user, place);
+				randomCoordinate += 2;
+			}
 		}
 	}
 
