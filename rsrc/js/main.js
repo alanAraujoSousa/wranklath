@@ -201,7 +201,21 @@ $(document).ready(function () {
 
         if (login != getCookie("user")) {
             rect.attr("filter", "url(#enemy)");
+        } else {
+            rect.on("click", handleMyUnitClick);
         }
+    };
+
+    function handleMyUnitClick() {
+        var unit = d3.event.target;
+        var x = Number(unit.getAttribute("x"));
+        var y = Number(unit.getAttribute("y"));
+
+        var factor = 50; // Factor is only to centralize.
+        var effect = d3.select("#selectUnitEffect");
+        effect.attr("cx", x + factor).attr("cy", y + factor);
+        effect.attr("style", "display:true;");
+        d3.event.stopPropagation();
     };
 
     function drawMap(initX, initY) {
@@ -305,8 +319,7 @@ $(document).ready(function () {
     };
 
     function stalkEntities() {
-        setInterval(
-            drawEnemiesVisible();, 10000);
+        setInterval(drawEnemiesVisible, 10000);
     };
 
     function drawEnemiesVisible() {
@@ -420,6 +433,12 @@ $(document).ready(function () {
             fit: false,
             center: false,
             dblClickZoomEnabled: false
+        });
+
+
+        d3.select("#paper").on("click", function () {
+            var effect = d3.select("#selectionEffect");
+            effect.attr("style", "display:none;");
         });
 
         drawMapVisible(initX, initY);
