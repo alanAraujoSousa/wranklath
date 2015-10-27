@@ -306,39 +306,41 @@ $(document).ready(function () {
 
     function stalkEntities() {
         setInterval(
-            function () {
-                var prom = retrieveEntitiesVisible();
-                prom.always(function (data) {
-                    dataBase.enemy.units = [];
-                    dataBase.enemy.buildings = [];
-                    if (data != null && data.length > 0) {
-                        for (var i = 0; i < data.length; i++) {
-                            var el = data[i];
-                            // FIXME find another way to differ builds and units.
-                            var a;
-                            if (el.conclusionDate == null)
-                                a = dataBase.enemy.units;
-                            else
-                                a = dataBase.enemy.buildings;
+            drawEnemiesVisible();, 10000);
+    };
 
-                            a.push(el);
-                        }
-                    }
-                    var x = panZoom.getPan().x;
-                    var y = panZoom.getPan().y;
-                    x = Number.parseInt(x / 100);
-                    y = Number.parseInt(y / 100);
+    function drawEnemiesVisible() {
+        var prom = retrieveEntitiesVisible();
+        prom.always(function (data) {
+            dataBase.enemy.units = [];
+            dataBase.enemy.buildings = [];
+            if (data != null && data.length > 0) {
+                for (var i = 0; i < data.length; i++) {
+                    var el = data[i];
+                    // FIXME find another way to differ builds and units.
+                    var a;
+                    if (el.conclusionDate == null)
+                        a = dataBase.enemy.units;
+                    else
+                        a = dataBase.enemy.buildings;
 
-                    // Only calc coordinates positives.
-                    if (x < 0)
-                        x *= -1;
+                    a.push(el);
+                }
+            }
+            var x = panZoom.getPan().x;
+            var y = panZoom.getPan().y;
+            x = Number.parseInt(x / 100);
+            y = Number.parseInt(y / 100);
 
-                    if (y < 0)
-                        y *= -1;
+            // Only calc coordinates positives.
+            if (x < 0)
+                x *= -1;
 
-                    drawEntitiesVisible(x, y);
-                });
-            }, 5000);
+            if (y < 0)
+                y *= -1;
+
+            drawEntitiesVisible(x, y);
+        });
     };
 
     function drawEntitiesVisible(initX, initY) {
