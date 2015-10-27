@@ -8,6 +8,7 @@ dataBase.enemy.buildings = [];
 dataBase.enemy.units = [];
 
 terrains = [];
+unitClicked = new Object();
 world = new Array(2500);
 queueDownloadMapChunck = new Array();
 map = new Object();
@@ -208,13 +209,40 @@ $(document).ready(function () {
 
     function handleMyUnitClick() {
         var unit = d3.event.target;
+        var id = unit.getAttribute("id");
         var x = Number(unit.getAttribute("x"));
         var y = Number(unit.getAttribute("y"));
 
-        var factor = 50; // Factor is only to centralize.
         var effect = d3.select("#selectUnitEffect");
-        effect.attr("cx", x + factor).attr("cy", y + factor);
-        effect.attr("style", "display:true;");
+        debugger;
+        if (id != unitClicked) {
+            unitClicked = id;
+            var factor = 50; // Factor is only to centralize.
+//            effect.attr("cx", x + factor).attr("cy", y + factor);
+            effect.attr("transform", "translate(" + (x + factor) + "," + (y + factor) + ")");
+            effect.attr("style", "display:true;");
+        } else {
+            unitClicked = null;
+            effect.attr("style", "display:none;");
+        }
+        var mapEffect = d3.select("#selectMapEffect");
+        mapEffect.attr("style", "display:none;");
+
+        d3.event.stopPropagation();
+    };
+
+    function handleMapClick() {
+        if (unitClicked != null) {
+            var map = d3.event.target;
+            var id = map.getAttribute("id");
+            var x = Number(map.getAttribute("x"));
+            var y = Number(map.getAttribute("y"));
+
+            var factor = 50; // Factor is only to centralize.
+            var effect = d3.select("#selectMapEffect");
+            effect.attr("transform", "translate(" + (x + factor) + "," + (y + factor) + ")");
+            effect.attr("style", "display:true;");
+        }
         d3.event.stopPropagation();
     };
 
@@ -256,7 +284,8 @@ $(document).ready(function () {
                             .attr("height", gridCellSize)
                             .attr("fill", getTerrain(world[index][x - 1][y - 1])) // ohhay!
                             .style("stroke-width", "1px")
-                            .style("stroke", "black");
+                            .style("stroke", "black")
+                            .on("click", handleMapClick);
                     }
                 }
             }
@@ -436,10 +465,7 @@ $(document).ready(function () {
         });
 
 
-        d3.select("#paper").on("click", function () {
-            var effect = d3.select("#selectionEffect");
-            effect.attr("style", "display:none;");
-        });
+        //        d3.select("#paper").on("click", handleMapClick);
 
         drawMapVisible(initX, initY);
         drawEntitiesVisible(initX, initY);
