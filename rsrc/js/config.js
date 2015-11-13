@@ -19,3 +19,4 @@ loginRest = defaultRoute + apiRoute + restUtil.login;
 listUnits = defaultRoute + apiRoute + restUtil.listUnits;
 listBuildings = defaultRoute + apiRoute + restUtil.listBuildings;
 allVisible = defaultRoute + apiRoute + restUtil.allVisible;
+move = defaultRoute + apiRoute + restUtil.move;

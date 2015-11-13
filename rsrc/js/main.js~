@@ -8,7 +8,7 @@ dataBase.enemy.buildings = [];
 dataBase.enemy.units = [];
 
 terrains = [];
-unitClicked = null;
+unitClicked = new Object();
 world = new Array(2500);
 queueDownloadMapChunck = new Array();
 map = new Object();
@@ -99,20 +99,6 @@ $(document).ready(function () {
         index = cookie.indexOf(";");
         cookie = cookie.substr(0, index);
         return cookie;
-    };
-
-    function executeMovement(deque) {
-        var token = getCookie("token");
-        return $.ajax({
-            url: move,
-            type: 'POST',
-            data: JSON.stringify(deque),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            headers: {
-                'token': token
-            }
-        });
     };
 
     function retrieveEntitiesVisible() {
@@ -228,9 +214,11 @@ $(document).ready(function () {
         var y = Number(unit.getAttribute("y"));
 
         var effect = d3.select("#selectUnitEffect");
+        debugger;
         if (id != unitClicked) {
             unitClicked = id;
             var factor = 50; // Factor is only to centralize.
+//            effect.attr("cx", x + factor).attr("cy", y + factor);
             effect.attr("transform", "translate(" + (x + factor) + "," + (y + factor) + ")");
             effect.attr("style", "display:true;");
         } else {
@@ -244,100 +232,19 @@ $(document).ready(function () {
     };
 
     function handleMapClick() {
-        if (unitClicked != null) { // if we have a unit selected.
+        if (unitClicked != null) {
             var map = d3.event.target;
             var id = map.getAttribute("id");
-            var mapX = Number(map.getAttribute("x"));
-            var mapY = Number(map.getAttribute("y"));
+            var x = Number(map.getAttribute("x"));
+            var y = Number(map.getAttribute("y"));
 
-            var factor = 50; // Factor is only to centralize the "X".
+            var factor = 50; // Factor is only to centralize.
             var effect = d3.select("#selectMapEffect");
-            effect.attr("transform", "translate(" + mapX + "," + mapY + ")");
+            effect.attr("transform", "translate(" + (x + factor) + "," + (y + factor) + ")");
             effect.attr("style", "display:true;");
-
-            console.debug(unitClicked);
-
-            var unit = d3.select("#" + unitClicked);
-            var unitX = unit.getAttribute("x");
-            var unitY = unit.getAttribute("y");
-
-            mapX = mapX - unitX;
-            mapY = mapY - unitY;
-
-            mapX += 30;
-            mapY += 30;
-
-            var matrix = findTerrainWalkableProperties(unitX, unitY);
-            var grid = new PF.Grid(matrix);
-            var finder = new PF.AStarFinder();
-            var path = finder.findPath(30, 30, mapX, mapY, grid);
-
-            var mapToSendToBackEnd[];
-            for (var i = 0; i < path.length; i++) {
-                var el = path[i];
-                mapX = el[0];
-                mapY = el[1];
-
-                mapX -= 30;
-                mapY -= 30;
-
-                mapX += unitX;
-                mapY += unitY;
-
-                mapToSendToBackEnd.push(mapX);
-                mapToSendToBackEnd.push(mapY);
-            }
-
-            var promise = executeMovement(mapToSendToBackEnd);
         }
         d3.event.stopPropagation();
     };
-
-    function findTerrainWalkableProperties(x, y) {
-        var buildings = dataBase.user.units;
-        var buildingsE = dataBase.enemy.units;
-        var buildings = dataBase.user.buildings;
-        var buildingsE = dataBase.enemy.buildings;
-
-        var placesWithSomething[][];
-        var allE = new Array();
-        $.merge(allE, ($.merge(buildings, buildingsE), $.merge(units, unitsE))); // (-8
-
-        if (allE != null && allE.length > 0) {
-            for (var i = 0; i < allE.length; i++) {
-                var el = allE[i];
-                var elX = el.place.x;
-                var elY = el.place.y;
-                placesWithSomething[elX][elY] = true;
-            }
-        }
-
-        var mapQiau[][];
-        var originalX = x;
-        var originalY = y;
-        x -= 30;
-        y -= 30;
-        for (var i = 0; i < 60; i++) {
-            for (var j = 0; j < 60; j++) {
-                var isPassable = false
-                if (x != originalX && y != originalY) {
-                    isPassable = true;
-                } else {
-                    var map = d3.select('#x' + x + 'y' + y)[0][0];
-                    if (map != null) {
-                        isPassable = isTerrainPassable(map.getAttribute('fill'));
-                        if (isPassable) {
-                            isPassable = placesWithSomething[x][y] == null;
-                        }
-                    }
-                }
-                mapQiau[i][j] = isPassable >>> 0;
-                y++;
-            }
-            x++;
-        }
-        return mapQiau;
-    }
 
     function drawMap(initX, initY) {
         var info = getInfoMapChunck(initX, initY);
@@ -356,34 +263,30 @@ $(document).ready(function () {
             downloadMapDataChunck(index).always(function (data) {
                 //remove download of queue
                 queueDownloadMapChunck.splice(queueDownloadMapChunck.indexOf(index), 1);
-                // store data of world
                 world[index] = data;
                 paint(index, deltaX, deltaY);
             });
         }
 
-    };
-
-    function paint(index, deltaX, deltaY) {
-        var isPainted = d3.select("#map" + index)[0][0] != null;
-        // if this chunck isn't already painted.
-        if (!isPainted) {
-            var group = d3.select('#mapGroup').append("g").attr("id", "map" + index);
-            for (var x = 1; x <= 100; x++) {
-                var factorX = x + deltaX;
-                for (var y = 1; y <= 100; y++) {
-                    var factorY = y + deltaY;
-                    var terrainType = world[index][x - 1][y - 1]; // ohhay!
-                    group.append("rect")
-                        .attr("id", "x" + factorX + "y" + factorY)
-                        .attr("x", factorX * gridCellSize)
-                        .attr("y", factorY * gridCellSize)
-                        .attr("width", gridCellSize)
-                        .attr("height", gridCellSize)
-                        .attr("fill", getTerrain(terrainType))
-                        .style("stroke-width", "1px")
-                        .style("stroke", "black")
-                        .on("click", handleMapClick);
+        function paint(index, deltaX, deltaY) {
+            var isPainted = d3.select("#map" + index)[0][0] != null;
+            if (!isPainted) { // if this chunck is already painted.
+                var group = d3.select('#mapGroup').append("g").attr("id", "map" + index);
+                for (var x = 1; x <= 100; x++) {
+                    var factorX = x + deltaX;
+                    for (var y = 1; y <= 100; y++) {
+                        var factorY = y + deltaY;
+                        group.append("rect")
+                            .attr("id", "x" + factorX + "y" + factorY)
+                            .attr("x", factorX * gridCellSize)
+                            .attr("y", factorY * gridCellSize)
+                            .attr("width", gridCellSize)
+                            .attr("height", gridCellSize)
+                            .attr("fill", getTerrain(world[index][x - 1][y - 1])) // ohhay!
+                            .style("stroke-width", "1px")
+                            .style("stroke", "black")
+                            .on("click", handleMapClick);
+                    }
                 }
             }
         }
@@ -410,12 +313,6 @@ $(document).ready(function () {
         info.deltaY = deltaY;
         return info;
     };
-
-    function isTerrainPassable(var type) {
-        if (type == "url(#water)")
-            return false;
-        return true;
-    }
 
     function getBuild(code) {
         switch (code) {
@@ -463,11 +360,13 @@ $(document).ready(function () {
                 for (var i = 0; i < data.length; i++) {
                     var el = data[i];
                     // FIXME find another way to differ builds and units.
+                    var a;
                     if (el.conclusionDate == null)
-                        dataBase.enemy.units.push(el);
+                        a = dataBase.enemy.units;
                     else
-                        dataBase.enemy.buildings.push(el);
+                        a = dataBase.enemy.buildings;
 
+                    a.push(el);
                 }
             }
             var x = panZoom.getPan().x;
@@ -570,7 +469,6 @@ $(document).ready(function () {
 
         drawMapVisible(initX, initY);
         drawEntitiesVisible(initX, initY);
-        drawEnemiesVisible();
 
         // pan to initial position.
         // TODO put initial coordinates on center of map.
