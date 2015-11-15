@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.commons.utils.Utils;
 import br.com.engine.persistence.beans.Place;
+import br.com.engine.persistence.beans.Unit;
 import br.com.engine.persistence.core.GenericDAO;
 
 public class PlaceDAO extends GenericDAO<Place> {
@@ -35,5 +36,12 @@ public class PlaceDAO extends GenericDAO<Place> {
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public void update(Place place) {
 		super.update(place);
+	}
+
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public void putUnit(Place place, Unit unit) {
+		place.setUnit(unit);
+		unit.setPlace(place);
+		this.update(place);
 	}
 }

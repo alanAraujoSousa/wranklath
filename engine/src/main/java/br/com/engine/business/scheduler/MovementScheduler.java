@@ -65,7 +65,8 @@ public class MovementScheduler {
 				// If my intent is attack other
 				UnitObject enemy = null;
 				UnitIntentEnum unitIntent = unit.getUnitIntent();
-				if (unitIntent != null && unitIntent.equals(UnitIntentEnum.ATTACK)) { // ATTAAAAACK
+				if (unitIntent != null
+						&& unitIntent.equals(UnitIntentEnum.ATTACK)) { // ATTAAAAACK
 
 					// Get my target Id
 					Long enemyId = unit.getTargetId();
@@ -88,7 +89,9 @@ public class MovementScheduler {
 					} else {
 
 						// Test ATTACK again :)
-						if (unitIntent != null && unit.getUnitIntent().equals(UnitIntentEnum.ATTACK)) {
+						if (unitIntent != null
+								&& unit.getUnitIntent().equals(
+										UnitIntentEnum.ATTACK)) {
 							execAttack(unit, enemy);
 						}
 					}
@@ -123,47 +126,63 @@ public class MovementScheduler {
 		Integer x = unitMovement.getMoves().pollFirst();
 		Integer y = unitMovement.getMoves().pollFirst();
 
-		Place place = placeDAO.findByCoordinates(x, y);
+		Place newPlace = placeDAO.findByCoordinates(x, y);
 
 		// Verify if this place is passable or if have a building
 		// constructed.
-		boolean passable = place.getType().isPassable();
-		Building building = place.getBuilding();
-		if (building != null || !passable) {
+		boolean passable = newPlace.getType().isPassable();
+		Building buildingObstacle = newPlace.getBuilding();
+		if (buildingObstacle != null || !passable) {
+			LOGGER.debug("Unit: " + unitObject.getId()
+					+ " had it's movement canceled by a obstacle, the building: " + buildingObstacle.getId());
 			return false;
 		}
-		Unit unit = place.getUnit();
-		if (unit != null) {
+		Unit unitObstacle = newPlace.getUnit();
+		if (unitObstacle != null) {
+			LOGGER.debug("Unit: " + unitObject.getId()
+					+ " had it's movement canceled by obstacle, the unit: " + unitObstacle.getId());
 			return false;
 		}
-		
+
 		// Clear my old position.
-		PlaceObject actualPlace = unitObject.getPlace();
-		this.placeDAO.clearUnitOnPlace(actualPlace.getX(), actualPlace.getY());
+		PlaceObject oldPlace = unitObject.getPlace();
+		this.placeDAO.clearUnitOnPlace(oldPlace.getX(), oldPlace.getY());
 
 		// Go to new position.
 		Unit myUnit = this.unitDAO.findById(unitObject.getId());
-		this.unitDAO.editPlace(myUnit, place);
-		
+		this.unitDAO.editPlace(myUnit, newPlace);
+		this.placeDAO.putUnit(newPlace, myUnit);
+
+		LOGGER.debug("Unit: " + myUnit.getId() + " go of: " + oldPlace.getX()
+				+ ":" + oldPlace.getY() + " to: " + newPlace.getX() + ":"
+				+ newPlace.getY());
 
 		// TODO Only edit cache after flush and clean session.
 		// Edit actual position in cache.
-		unitObject.setPlace(place.generateTransportObject());
+		unitObject.setPlace(newPlace.generateTransportObject());
+
+		if (unitMovement.getMoves().isEmpty()) {
+			LOGGER.debug("Unit: " + unitObject.getId()
+					+ " research your final location: " + newPlace.getX() + ":"
+					+ newPlace.getY());
+			return false;
+		}
 
 		// Calc time to next move.
+		// Get move buff
 		Integer moveBuff = Utils.calcMoveBuff(unitObject.getType(),
-				place.getType());
+				newPlace.getType());
+		// Default cost of movement.
 		Integer moveTime = Utils.DEFAULT_MOVE_TIME;
 
-		if (unitMovement.getMoves().isEmpty())
-			return false;
-
 		// Get next step.
-		Integer nextX = unitMovement.getMoves().pollFirst();
-		Integer nextY = unitMovement.getMoves().pollFirst();
+		Integer nextX = unitMovement.getMoves().getFirst();
+		Integer nextY = unitMovement.getMoves().getFirst();
 
-		// FIXME lvl 1000: If the unit try a diagonal movement don't let it cross corners!!!!
-		// diagonal moviment
+		// FIXME lvl 99999: If the unit try a diagonal movement don't let it
+		// cross the corners!!!!
+		
+		// If is a diagonal moviment.
 		if (!x.equals(nextX) && !y.equals(nextY)) {
 			moveTime = Utils.DIAGONAL_MOVE_TIME;
 		}
@@ -173,9 +192,6 @@ public class MovementScheduler {
 
 		timeToNextMove.setTime(timeToNextMove.getTime() + moveTime);
 		unitObject.setTimeToNextMove(timeToNextMove);
-		
-		// Save in the cache the new actual place.
-		unitObject.setPlace(place.generateTransportObject());
 
 		return true;
 	}

@@ -6,6 +6,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import br.com.commons.exceptions.InvalidArgumentException;
@@ -22,14 +23,16 @@ import br.com.engine.persistence.dao.UserDAO;
 
 public class UnitService {
 
+	private static final Logger LOGGER = Logger.getLogger(UnitService.class);
+
 	@Autowired
 	private UserDAO userDAO;
-	
+
 	@Autowired
 	private UnitDAO unitDAO;
 
 	public void move(UserObject user, Long id, Deque<Integer> places) {
-		
+
 		Unit unit = this.unitDAO.findByIdAndUser(id, user.getId());
 		if (unit == null)
 			throw new InvalidArgumentException("Unit not found: " + id);
@@ -64,8 +67,11 @@ public class UnitService {
 		MovementObject movementObject = new MovementObject();
 		movementObject.setMoves(places);
 		unitObject.setMovementObject(movementObject);
+
+		LOGGER.debug("Unit: " + unit.getId() + " is trying to run " + (places.size() / 2)
+				+ " movements.");
 	}
-	
+
 	public List<UnitObject> listByUser(UserObject userObject) {
 		List<Unit> units = this.unitDAO.listByUser(userObject.getId());
 		List<UnitObject> unitObjects = new ArrayList<>();
