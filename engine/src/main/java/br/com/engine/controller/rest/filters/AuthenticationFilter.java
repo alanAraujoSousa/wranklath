@@ -36,8 +36,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 			return;
 		}
 
-		LOGGER.info("Authentication request for: " + uri);
-
 		String token = requestContext.getHeaders().get(TOKEN_PROPERTY).get(0);
 
 		if (token == null || token.isEmpty()) {

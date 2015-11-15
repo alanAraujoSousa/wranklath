@@ -19,12 +19,13 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 @Provider
 public class ExceptionsHandler implements ExceptionMapper<Throwable> {
 
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(ExceptionsHandler.class);
 
 	@Override
 	public Response toResponse(Throwable exception) {
+
 		if (exception instanceof DefaultOptionsMethodException) {
-			LOGGER.debug("options");
 			return Response.ok().build();
 		}
 

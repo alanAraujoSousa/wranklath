@@ -23,6 +23,7 @@ import br.com.engine.business.service.UserService;
 @Path("/unit")
 public class UnitRest {
 
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(UnitRest.class);
 
 	@Autowired

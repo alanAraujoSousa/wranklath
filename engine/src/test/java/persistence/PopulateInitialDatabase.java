@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,10 +25,8 @@ import br.com.commons.transport.UserGroupObject;
 import br.com.commons.transport.UserObject;
 import br.com.commons.utils.CryptUtil;
 import br.com.commons.utils.Utils;
-import br.com.engine.persistence.beans.Building;
 import br.com.engine.persistence.beans.Permission;
 import br.com.engine.persistence.beans.Place;
-import br.com.engine.persistence.beans.Unit;
 import br.com.engine.persistence.beans.User;
 import br.com.engine.persistence.beans.UserGroup;
 import br.com.engine.persistence.core.HibernateUtil;
@@ -84,6 +81,7 @@ public class PopulateInitialDatabase {
 		 assignPermissionToUsers();
 	}
 
+	@SuppressWarnings("unused")
 	private void saveMap() {
 		Date startDateOfBatchProcess = new Date();
 

@@ -16,10 +16,8 @@ import br.com.commons.enums.PermissionEnum;
 import br.com.commons.exceptions.InvalidLoginException;
 import br.com.commons.exceptions.InvalidPermissionException;
 import br.com.commons.exceptions.InvalidTokenException;
-import br.com.commons.transport.BuildingObject;
 import br.com.commons.transport.PlaceObject;
 import br.com.commons.transport.SessionObject;
-import br.com.commons.transport.UnitObject;
 import br.com.commons.transport.UserGroupObject;
 import br.com.commons.transport.UserObject;
 import br.com.commons.utils.CryptUtil;
@@ -195,10 +193,12 @@ public class UserService {
 		Set<PlaceObject> listAllPlacesVisible = new HashSet<PlaceObject>();
 		Long userId = userObject.getId();
 		Set<PlaceObject> placesDenied = new HashSet<PlaceObject>();
+		List<Object> listAllEntitiesVisible = new ArrayList<Object>();
 
 		// Code replication I KNOW!
-		List<Unit> units = this.unitDAO.listByUser(userId);
-		for (Unit unit : units) {
+		List<Unit> userUnits = this.unitDAO.listByUser(userId);
+		for (Unit unit : userUnits) {
+			listAllEntitiesVisible.add(unit.generateTransportObject());
 			Place place = unit.getPlace();
 			Set<PlaceObject> visibles = Utils.listAllPlacesVisible(unit
 					.getType().getVisibility(), place.getX(), place.getY());
@@ -206,8 +206,9 @@ public class UserService {
 			placesDenied.add(place.generateTransportObject());
 			listAllPlacesVisible.addAll(visibles);
 		}
-		List<Building> buildings = this.buildingDAO.listByUser(userId);
-		for (Building build : buildings) {
+		List<Building> userBuildings = this.buildingDAO.listByUser(userId);
+		for (Building build : userBuildings) {
+			listAllEntitiesVisible.add(build.generateTransportObject());
 			Place place = build.getPlace();
 			// FIXME improve visibility property on buildings.
 			int miau = 3;
@@ -220,26 +221,20 @@ public class UserService {
 		
 		listAllPlacesVisible.removeAll(placesDenied);
 		
-		Set<UnitObject> unitObjects = new HashSet<UnitObject>();
-		Set<BuildingObject> buildingsObjects = new HashSet<BuildingObject>();
 		for (PlaceObject placeVisible : listAllPlacesVisible) {
 			Place place = this.placeDAO.findByCoordinates(placeVisible.getX(),
 					placeVisible.getY());
 			Building building = place.getBuilding();
 			if (building != null) {
-				buildingsObjects.add(building.generateTransportObject());
+				listAllEntitiesVisible.add(building.generateTransportObject());
 			}
 			Unit unit = place.getUnit();
 			if (unit != null) {
-				unitObjects.add(unit.generateTransportObject());
+				listAllEntitiesVisible.add(unit.generateTransportObject());
 			}
 		}
 
-		List<Object> list = new ArrayList<Object>();
-		list.addAll(unitObjects);
-		list.addAll(buildingsObjects);
-		
-		return list;
+		return listAllEntitiesVisible;
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
