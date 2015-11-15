@@ -400,9 +400,6 @@ public class Utils {
 		Integer x = placeActual.getX();
 		Integer y = placeActual.getY();
 
-		places.addFirst(y);
-		places.addFirst(x);
-
 		for (Iterator<Integer> iterator = places.iterator(); iterator.hasNext();) {
 			Integer nextX = iterator.next();
 			Integer nextY = iterator.next();
