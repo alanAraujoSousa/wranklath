@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
@@ -395,7 +396,32 @@ public class Utils {
 
 	public static boolean validateMovement(PlaceObject placeActual,
 			Deque<Integer> places) {
-		// TODO Auto-generated method stub
+
+		Integer x = placeActual.getX();
+		Integer y = placeActual.getY();
+
+		places.addFirst(y);
+		places.addFirst(x);
+
+		for (Iterator<Integer> iterator = places.iterator(); iterator.hasNext();) {
+			Integer nextX = iterator.next();
+			Integer nextY = iterator.next();
+
+			x -= nextX;
+			y -= nextY;
+
+			// discard negative values
+			int v = x < 0 ? -1 : 1;
+			x *= v;
+			y *= v;
+
+			if (x > 1 || y > 1)
+				return false;
+
+			x = nextX;
+			y = nextY;
+		}
+
 		return true;
 	}
 
