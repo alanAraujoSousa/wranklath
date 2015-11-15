@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.commons.enums.UnitIntentEnum;
 import br.com.commons.transport.CombatObject;
 import br.com.commons.transport.MovementObject;
+import br.com.commons.transport.PlaceObject;
 import br.com.commons.transport.UnitObject;
 import br.com.commons.utils.Utils;
 import br.com.engine.persistence.beans.Building;
@@ -63,7 +64,8 @@ public class MovementScheduler {
 
 				// If my intent is attack other
 				UnitObject enemy = null;
-				if (unit.getUnitIntent().equals(UnitIntentEnum.ATTACK)) { // ATTAAAAACK
+				UnitIntentEnum unitIntent = unit.getUnitIntent();
+				if (unitIntent != null && unitIntent.equals(UnitIntentEnum.ATTACK)) { // ATTAAAAACK
 
 					// Get my target Id
 					Long enemyId = unit.getTargetId();
@@ -86,7 +88,7 @@ public class MovementScheduler {
 					} else {
 
 						// Test ATTACK again :)
-						if (unit.getUnitIntent().equals(UnitIntentEnum.ATTACK)) {
+						if (unitIntent != null && unit.getUnitIntent().equals(UnitIntentEnum.ATTACK)) {
 							execAttack(unit, enemy);
 						}
 					}
@@ -134,12 +136,18 @@ public class MovementScheduler {
 		if (unit != null) {
 			return false;
 		}
+		
+		// Clear my old position.
+		PlaceObject actualPlace = unitObject.getPlace();
+		this.placeDAO.clearUnitOnPlace(actualPlace.getX(), actualPlace.getY());
 
-		// Run movement.
+		// Go to new position.
 		Unit myUnit = this.unitDAO.findById(unitObject.getId());
 		this.unitDAO.editPlace(myUnit, place);
-		// Edit actual position in cache.
+		
+
 		// TODO Only edit cache after flush and clean session.
+		// Edit actual position in cache.
 		unitObject.setPlace(place.generateTransportObject());
 
 		// Calc time to next move.
@@ -154,8 +162,9 @@ public class MovementScheduler {
 		Integer nextX = unitMovement.getMoves().pollFirst();
 		Integer nextY = unitMovement.getMoves().pollFirst();
 
+		// FIXME lvl 1000: If the unit try a diagonal movement don't let it cross corners!!!!
 		// diagonal moviment
-		if (x != nextX && y != nextY) {
+		if (!x.equals(nextX) && !y.equals(nextY)) {
 			moveTime = Utils.DIAGONAL_MOVE_TIME;
 		}
 
@@ -164,6 +173,9 @@ public class MovementScheduler {
 
 		timeToNextMove.setTime(timeToNextMove.getTime() + moveTime);
 		unitObject.setTimeToNextMove(timeToNextMove);
+		
+		// Save in the cache the new actual place.
+		unitObject.setPlace(place.generateTransportObject());
 
 		return true;
 	}
