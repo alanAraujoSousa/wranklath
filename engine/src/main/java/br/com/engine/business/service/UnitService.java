@@ -32,17 +32,21 @@ public class UnitService {
 	private UnitDAO unitDAO;
 
 	public void move(UserObject user, Long id, Deque<Integer> places) {
-
+		
+		if(places == null || places.isEmpty()){
+			throw new MovementException("You choose a empty movement!");
+		}
+		
 		Unit unit = this.unitDAO.findByIdAndUser(id, user.getId());
 		if (unit == null)
 			throw new InvalidArgumentException("Unit not found: " + id);
 
 		UnitObject unitObject = UnitCache.getInstance().findUnitByIdOnMove(id);
-		PlaceObject placeObject = unitObject.getPlace();
-		Integer actualX = placeObject.getX();
-		Integer actualY = placeObject.getY();
+		PlaceObject actualPlaceObject = unitObject.getPlace();
+		Integer actualX = actualPlaceObject.getX();
+		Integer actualY = actualPlaceObject.getY();
 
-		boolean isValid = Utils.validateMovement(placeObject, places);
+		boolean isValid = Utils.validateMovement(actualPlaceObject, places);
 		if (!isValid)
 			throw new MovementException("You choose a movement invalid!");
 
@@ -51,7 +55,7 @@ public class UnitService {
 		Integer nextY = iterator.next();
 
 		Integer moveBuff = Utils.calcMoveBuff(unitObject.getType(),
-				placeObject.getType());
+				actualPlaceObject.getType());
 		Integer moveTime = Utils.DEFAULT_MOVE_TIME;
 
 		// diagonal moviment
