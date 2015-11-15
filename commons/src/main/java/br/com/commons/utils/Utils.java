@@ -411,9 +411,10 @@ public class Utils {
 			y -= nextY;
 
 			// discard negative values
-			int v = x < 0 ? -1 : 1;
-			x *= v;
-			y *= v;
+			 if (x < 0)
+		            x *= -1;
+		     if (y < 0)
+		            y *= -1;
 
 			if (x > 1 || y > 1)
 				return false;
