@@ -61,14 +61,11 @@ $(document).ready(function () {
     });
 
     function mapPageWorkflow() {
-        var promiseBuild = retrieveBuildingData();
-        var promiseUnit = retrieveUnitData();
-
-        $.when(promiseBuild, promiseUnit).done(function (towns, armys) {
-            dataBase.user.buildings = towns[0];
-            dataBase.user.units = armys[0];
+        var promise = downloadNewEntities();
+        $.when(promise).done(function () {
             generateInitialMap();
         });
+
     }
 
     $('#btnLogin').click(function (e) {
@@ -206,7 +203,7 @@ $(document).ready(function () {
     };
 
     function handleMapClick() {
-        if (unitClicked != null && unitClicked.search("unit") > 0) { // if we have a unit selected.
+        if (unitClicked != null && unitClicked.search("unit") >= 0) { // if we have a unit selected.
             var map = d3.event.target;
             var id = map.getAttribute("id");
             var mapX = Number(map.getAttribute("x"));
@@ -342,6 +339,18 @@ $(document).ready(function () {
         return grid;
     }
 
+    function drawMapVisible(x, y) {
+        drawMap(x, y + 50);
+        drawMap(x, y - 50);
+        drawMap(x + 50, y);
+        drawMap(x + 50, y + 50);
+        drawMap(x + 50, y - 50);
+        drawMap(x - 50, y);
+        drawMap(x - 50, y - 50);
+        drawMap(x - 50, y - 50);
+    };
+
+
     function drawMap(initX, initY) {
         var info = getInfoMapChunck(initX, initY);
         var index = info.index;
@@ -454,47 +463,61 @@ $(document).ready(function () {
     };
 
     function stalkEntities() {
-        setInterval(drawEnemiesVisible, 5000);
+        setInterval(function () {
+            var promise = downloadNewEntities();
+            $.when(promise).done(function () {
+                drawEntitiesVisible();
+            });
+        }, 5000); // draw all
     };
 
-    function drawEnemiesVisible() {
+    function downloadNewEntities() {
         var prom = retrieveEntitiesVisible();
         prom.always(function (data) {
+            dataBase.user.units = [];
+            dataBase.user.buildings = [];
             dataBase.enemy.units = [];
             dataBase.enemy.buildings = [];
             if (data != null && data.length > 0) {
                 for (var i = 0; i < data.length; i++) {
                     var el = data[i];
-                    // FIXME find another way to differ builds and units.
-                    if (el.conclusionDate == null)
-                        dataBase.enemy.units.push(el);
-                    else
-                        dataBase.enemy.buildings.push(el);
 
+                    var login = el.userLogin;
+                    var owner;
+                    if (login != getCookie("user"))
+                        owner = dataBase.enemy;
+                    else
+                        owner = dataBase.user;
+
+                    // FIXME find another way to differ builds and units.
+                    if (el.conclusionDate == null) {
+                        owner.units.push(el);
+                    } else {
+                        owner.buildings.push(el);
+                    }
                 }
             }
-            var x = panZoom.getPan().x;
-            var y = panZoom.getPan().y;
-            x = Number.parseInt(x / 100);
-            y = Number.parseInt(y / 100);
-
-            // Only calc coordinates positives.
-            if (x < 0)
-                x *= -1;
-
-            if (y < 0)
-                y *= -1;
-
-            drawEntitiesVisible(x, y);
         });
+        return prom;
     };
 
-    function drawEntity(entity, name) {
+    function drawEntity(entity) {
         var x = entity.place.x;
         var y = entity.place.y;
         var type = entity.type;
         var id = entity.id;
         var login = entity.userLogin;
+
+        debugger;
+
+        var name;
+        if (entity.conclusionDate == null) {
+            name = 'unit'
+            type = getUnit(type);
+        } else {
+            name = 'building'
+            type = getBuild(type);
+        }
 
         var d3Element = d3.select("#" + name + id);
         var elementDrawed = d3Element[0][0];
@@ -507,12 +530,6 @@ $(document).ready(function () {
             } else {
                 d3Element.remove();
             }
-        }
-
-        if (name == "unit") {
-            type = getUnit(type);
-        } else {
-            type = getBuild(type);
         }
 
         var rect = d3.select("#" + name + "Group").append("rect")
@@ -530,56 +547,42 @@ $(document).ready(function () {
         }
     };
 
-    function drawEntitiesVisible(initX, initY) {
-        drawBuildVisible(initX, initY);
-        drawUnitVisible(initX, initY);
-    };
+    function drawEntitiesVisible() {
 
-    // Go horse
-    function drawBuildVisible(x, y) {
+        // top, left corner.
+        var initX = panZoom.getPan().x;
+        var initY = panZoom.getPan().y;
+        initX = Number.parseInt(initX / 100);
+        initY = Number.parseInt(initY / 100);
+
+        // Only calc coordinates positives.
+        if (initX < 0)
+            initX *= -1;
+
+        if (initY < 0)
+            initY *= -1;
+
         var range = 30;
         var buildings = dataBase.user.buildings;
         var buildingsE = dataBase.enemy.buildings;
-        var all = new Array();
-        $.merge($.merge(all, buildings), buildingsE);
-        for (var i = 0; i < all.length; i++) {
-            var building = all[i];
-            var targetX = building.place.x;
-            var targetY = building.place.y;
-
-            if (((x - range) <= targetX && (x + range) >= targetX) &&
-                ((y - range) <= targetY && (y + range) >= targetY))
-                drawEntity(building, "building");
-        }
-    };
-
-    // Go go horse
-    function drawUnitVisible(x, y) {
-        var range = 30;
         var units = dataBase.user.units;
         var unitsE = dataBase.enemy.units;
+
         var all = new Array();
+        $.merge($.merge(all, buildings), buildingsE);
         $.merge($.merge(all, units), unitsE);
+
+        debugger;
+
         for (var i = 0; i < all.length; i++) {
-            var unit = all[i];
-            var targetX = unit.place.x;
-            var targetY = unit.place.y;
+            var entity = all[i];
+            var targetX = entity.place.x;
+            var targetY = entity.place.y;
 
-            if (((x - range) <= targetX && (x + range) >= targetX) &&
-                ((y - range) <= targetY && (y + range) >= targetY))
-                drawEntity(unit, "unit");
+            if (((initX - range) <= targetX && (initX + range) >= targetX) &&
+                ((initY - range) <= targetY && (initY + range) >= targetY))
+                drawEntity(entity);
         }
-    };
-
-    function drawMapVisible(x, y) {
-        drawMap(x, y + 50);
-        drawMap(x, y - 50);
-        drawMap(x + 50, y);
-        drawMap(x + 50, y + 50);
-        drawMap(x + 50, y - 50);
-        drawMap(x - 50, y);
-        drawMap(x - 50, y - 50);
-        drawMap(x - 50, y - 50);
     };
 
     function generateInitialMap() {
@@ -609,12 +612,8 @@ $(document).ready(function () {
             dblClickZoomEnabled: false
         });
 
-
-        //        d3.select("#paper").on("click", handleMapClick);
-
+        // Draw initial map
         drawMapVisible(initX, initY);
-        drawEntitiesVisible(initX, initY);
-        drawEnemiesVisible();
 
         // pan to initial position.
         // TODO put initial coordinates on center of map.
