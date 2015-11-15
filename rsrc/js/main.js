@@ -101,10 +101,12 @@ $(document).ready(function () {
         return cookie;
     };
 
-    function executeMovement(deque) {
+    function executeMovement(deque, unitClickedId) {
+        unitClickedId = unitClickedId.replace('unit', ''); // delete prefix
+        var url = move.replace('{id}', unitClickedId); // insert id on uri
         var token = getCookie("token");
         return $.ajax({
-            url: move,
+            url: url,
             type: 'POST',
             data: JSON.stringify(deque),
             contentType: 'application/json; charset=utf-8',
@@ -180,47 +182,6 @@ $(document).ready(function () {
         return time;
     };
 
-    function drawEntity(entity, name) {
-        var x = entity.place.x;
-        var y = entity.place.y;
-        var type = entity.type;
-        var id = entity.id;
-        var login = entity.userLogin;
-
-        var d3Element = d3.select("#" + name + id);
-        var elementDrawed = d3Element[0][0];
-        if (elementDrawed != null) {
-            var actualX = elementDrawed.getAttribute("x") / gridCellSize;
-            var actualY = elementDrawed.getAttribute("y") / gridCellSize;
-
-            if (actualX == x && actualY == y) {
-                return;
-            } else {
-                d3Element.remove();
-            }
-        }
-
-        if (name == "unit") {
-            type = getUnit(type);
-        } else {
-            type = getBuild(type);
-        }
-
-        var rect = d3.select("#" + name + "Group").append("rect")
-        rect.attr("id", name + id)
-            .attr("x", x * gridCellSize)
-            .attr("y", y * gridCellSize)
-            .attr("width", gridCellSize)
-            .attr("height", gridCellSize)
-            .attr("fill", type);
-
-        if (login != getCookie("user")) {
-            rect.attr("filter", "url(#enemy)");
-        } else {
-            rect.on("click", handleMyUnitClick);
-        }
-    };
-
     function handleMyUnitClick() {
         var unit = d3.event.target;
         var id = unit.getAttribute("id");
@@ -230,7 +191,7 @@ $(document).ready(function () {
         var effect = d3.select("#selectUnitEffect");
         if (id != unitClicked) {
             unitClicked = id;
-            var factor = 50; // Factor is only to centralize.
+            var factor = gridCellSize / 2; // Factor is only to centralize.
             effect.attr("transform", "translate(" + (x + factor) + "," + (y + factor) + ")");
             effect.attr("style", "display:true;");
         } else {
@@ -239,104 +200,146 @@ $(document).ready(function () {
         }
         var mapEffect = d3.select("#selectMapEffect");
         mapEffect.attr("style", "display:none;");
+        d3.select("#path").remove();
 
         d3.event.stopPropagation();
     };
 
     function handleMapClick() {
-        if (unitClicked != null) { // if we have a unit selected.
+        if (unitClicked != null && unitClicked.search("unit") > 0) { // if we have a unit selected.
             var map = d3.event.target;
             var id = map.getAttribute("id");
             var mapX = Number(map.getAttribute("x"));
             var mapY = Number(map.getAttribute("y"));
 
             var factor = 50; // Factor is only to centralize the "X".
+
+            d3.select("#path").remove();
             var effect = d3.select("#selectMapEffect");
             effect.attr("transform", "translate(" + mapX + "," + mapY + ")");
             effect.attr("style", "display:true;");
 
-            console.debug(unitClicked);
-
-            var unit = d3.select("#" + unitClicked);
-            var unitX = unit.getAttribute("x");
-            var unitY = unit.getAttribute("y");
+            var unit = d3.select("#" + unitClicked)[0][0];
+            var unitX = unit.getAttribute("x") / 100;
+            var unitY = unit.getAttribute("y") / 100;
+            mapX /= 100;
+            mapY /= 100;
 
             mapX = mapX - unitX;
             mapY = mapY - unitY;
 
-            mapX += 30;
-            mapY += 30;
+            mapX += 29;
+            mapY += 29;
 
-            var matrix = findTerrainWalkableProperties(unitX, unitY);
-            var grid = new PF.Grid(matrix);
-            var finder = new PF.AStarFinder();
-            var path = finder.findPath(30, 30, mapX, mapY, grid);
+            var grid = findTerrainWalkableProperties(unitX, unitY);
+            var finder = new PF.AStarFinder({
+                allowDiagonal: true,
+                dontCrossCorners: true
+            });
 
-            var mapToSendToBackEnd[];
+            var path = finder.findPath(29, 29, mapX, mapY, grid);
+
+            var pathToBeDrawed = [];
             for (var i = 0; i < path.length; i++) {
                 var el = path[i];
                 mapX = el[0];
                 mapY = el[1];
 
-                mapX -= 30;
-                mapY -= 30;
+                mapX -= 29;
+                mapY -= 29;
 
                 mapX += unitX;
                 mapY += unitY;
 
-                mapToSendToBackEnd.push(mapX);
-                mapToSendToBackEnd.push(mapY);
+                var obj = {};
+                obj.x = mapX * 100;
+                obj.y = mapY * 100;
+                pathToBeDrawed.push(obj);
             }
 
-            var promise = executeMovement(mapToSendToBackEnd);
+            var lineFunction = d3.svg.line()
+                .x(function (d) {
+                    return d.x + (gridCellSize / 2); // 50 to centralize effect on grid
+                })
+                .y(function (d) {
+                    return d.y + (gridCellSize / 2);
+                })
+                .interpolate("linear");
+
+            var lineGraph = d3.select('#movementEffects').append("path")
+                .attr("id", "path")
+                .attr("d", lineFunction(pathToBeDrawed))
+                .attr("stroke", "green")
+                .attr("stroke-width", 12)
+                .attr("stroke-dasharray", "50,25")
+                .attr("fill", "none");
+
+            var mapToSendToBackEnd = new Array();
+            for (var i = 1; i < pathToBeDrawed.length; i++) { // jump first location
+                var x = pathToBeDrawed[i].x / 100;
+                var y = pathToBeDrawed[i].y / 100;
+                mapToSendToBackEnd.push(x);
+                mapToSendToBackEnd.push(y);
+            }
+
+            var promise = executeMovement(mapToSendToBackEnd, unitClicked);
         }
         d3.event.stopPropagation();
     };
 
     function findTerrainWalkableProperties(x, y) {
-        var buildings = dataBase.user.units;
-        var buildingsE = dataBase.enemy.units;
+        var units = dataBase.user.units;
+        var unitsE = dataBase.enemy.units;
         var buildings = dataBase.user.buildings;
         var buildingsE = dataBase.enemy.buildings;
 
-        var placesWithSomething[][];
         var allE = new Array();
-        $.merge(allE, ($.merge(buildings, buildingsE), $.merge(units, unitsE))); // (-8
+
+        // (:
+        var allU = $.merge($.merge([], units), unitsE);
+        var allB = $.merge($.merge([], buildings), buildingsE);
+        $.merge(allE, allB);
+        $.merge(allE, allU);
+
+        // Grid array-like,
+        var grid = new PF.Grid(60, 60);
 
         if (allE != null && allE.length > 0) {
             for (var i = 0; i < allE.length; i++) {
                 var el = allE[i];
                 var elX = el.place.x;
                 var elY = el.place.y;
-                placesWithSomething[elX][elY] = true;
+
+                elX -= x;
+                elY -= y;
+                elX += 29;
+                elY += 29;
+
+                if (elX > 59 || elY > 59)
+                    continue;
+
+                grid.setWalkableAt(elX, elY, false);
             }
         }
 
-        var mapQiau[][];
-        var originalX = x;
-        var originalY = y;
-        x -= 30;
-        y -= 30;
         for (var i = 0; i < 60; i++) {
             for (var j = 0; j < 60; j++) {
                 var isPassable = false
-                if (x != originalX && y != originalY) {
+                if (i == 29 && j == 29) {
                     isPassable = true;
                 } else {
-                    var map = d3.select('#x' + x + 'y' + y)[0][0];
-                    if (map != null) {
-                        isPassable = isTerrainPassable(map.getAttribute('fill'));
-                        if (isPassable) {
-                            isPassable = placesWithSomething[x][y] == null;
+                    if (grid.isWalkableAt(i, j)) {
+                        var map = d3.select('#x' + ((x - 29) + i) + 'y' + ((y - 29) + j))[0][0];
+                        if (map != null) {
+                            isPassable = isTerrainPassable(map.getAttribute('fill'));
                         }
                     }
                 }
-                mapQiau[i][j] = isPassable >>> 0;
-                y++;
+                // isPassable = isPassable >>> 0;
+                grid.setWalkableAt(i, j, isPassable);
             }
-            x++;
         }
-        return mapQiau;
+        return grid;
     }
 
     function drawMap(initX, initY) {
@@ -411,7 +414,7 @@ $(document).ready(function () {
         return info;
     };
 
-    function isTerrainPassable(var type) {
+    function isTerrainPassable(type) {
         if (type == "url(#water)")
             return false;
         return true;
@@ -451,7 +454,7 @@ $(document).ready(function () {
     };
 
     function stalkEntities() {
-        setInterval(drawEnemiesVisible, 10000);
+        setInterval(drawEnemiesVisible, 5000);
     };
 
     function drawEnemiesVisible() {
@@ -484,6 +487,47 @@ $(document).ready(function () {
 
             drawEntitiesVisible(x, y);
         });
+    };
+
+    function drawEntity(entity, name) {
+        var x = entity.place.x;
+        var y = entity.place.y;
+        var type = entity.type;
+        var id = entity.id;
+        var login = entity.userLogin;
+
+        var d3Element = d3.select("#" + name + id);
+        var elementDrawed = d3Element[0][0];
+        if (elementDrawed != null) {
+            var actualX = elementDrawed.getAttribute("x") / gridCellSize;
+            var actualY = elementDrawed.getAttribute("y") / gridCellSize;
+
+            if (actualX == x && actualY == y) {
+                return;
+            } else {
+                d3Element.remove();
+            }
+        }
+
+        if (name == "unit") {
+            type = getUnit(type);
+        } else {
+            type = getBuild(type);
+        }
+
+        var rect = d3.select("#" + name + "Group").append("rect")
+        rect.attr("id", name + id)
+            .attr("x", x * gridCellSize)
+            .attr("y", y * gridCellSize)
+            .attr("width", gridCellSize)
+            .attr("height", gridCellSize)
+            .attr("fill", type);
+
+        if (login != getCookie("user")) {
+            rect.attr("filter", "url(#enemy)");
+        } else {
+            rect.on("click", handleMyUnitClick);
+        }
     };
 
     function drawEntitiesVisible(initX, initY) {

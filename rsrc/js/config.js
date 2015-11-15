@@ -9,7 +9,7 @@ ds = 'd';
 restUtil = {
     login: "/user/login",
     logout: "/user/logout",
-    move: "/unit/move",
+    move: "/unit/{id}/move",
     listUnits: "/user/unit",
     listBuildings: "/user/building",
     allVisible: "/user/allvisible"
