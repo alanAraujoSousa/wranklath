@@ -41,7 +41,6 @@ public class UnitDAO extends GenericDAO<Unit> {
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public void editPlace(Unit unit, Place place) {
 		unit.setPlace(place);
-		place.setUnit(unit);
 		this.update(unit);
 	}
 

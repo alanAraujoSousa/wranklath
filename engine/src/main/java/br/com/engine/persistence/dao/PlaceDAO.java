@@ -9,29 +9,18 @@ import br.com.engine.persistence.beans.Place;
 import br.com.engine.persistence.core.GenericDAO;
 
 public class PlaceDAO extends GenericDAO<Place> {
-
+	
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
 	public Place findById(Long id) {
 		return (Place) this.getCriteria().add(Restrictions.eq("id", id))
 				.uniqueResult();
 	}
-
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
 	public Place findByCoordinates(Integer x, Integer y) {
-		return (Place) this.getCriteria()
-				.add(Restrictions.eq("id", Utils.convertCoordinateToId(x, y)))
+		return (Place) this.getCriteria().add(Restrictions.eq("id", Utils.convertCoordinateToId(x, y)))
 				.uniqueResult();
 	}
-
-	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-	public void clearUnitOnPlace(Integer x, Integer y) {
-		Place place = (Place) this.getCriteria()
-				.add(Restrictions.eq("id", Utils.convertCoordinateToId(x, y)))
-				.uniqueResult();
-		place.setUnit(null);
-		super.update(place);
-	}
-
+	
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public void update(Place place) {
 		super.update(place);
