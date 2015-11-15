@@ -14,12 +14,110 @@ import br.com.commons.transport.PlaceObject;
 public class Utils {
 
 	private final static String THE_NUMBER_OF_THE_BEST = "666";
-	public final static int DEFAULT_MOVE_TIME = 10000; // milliseconds
-	public final static int DIAGONAL_MOVE_TIME = 15000; // milliseconds
+	public final static int DEFAULT_MOVE_TIME = 60000; // milliseconds
+	public final static int DIAGONAL_MOVE_TIME = 90000; // milliseconds
 	public final static int COMBAT_ROUND_TIME = 30000; // milliseconds
 	public final static int ORTOGONAL_COST = 1;
 	public final static double DIAGONAL_COST = 1.5;
 	public static final int MAP_SIZE = 5000;
+
+	/**
+	 * Convert a literal amount in bytes
+	 * 
+	 * @param value
+	 *            - A integer value + using K (Kilobytes), M (Megabytes), G
+	 *            (Gigabytes), T (Terabytes), P (Petabytes)
+	 * @return The given amount in bytes
+	 */
+	public static long convertToBytes(final String value) {
+		long result = 0;
+
+		final boolean isBytes = value.matches("^.+?\\d$");
+		if (!isBytes && (value.length() > 1)) {
+			final Float quote = Float.valueOf(value.substring(0,
+					value.length() - 1));
+
+			final char mul = value.toLowerCase().charAt(value.length() - 1);
+			switch (mul) {
+			case 'k': {
+				result = Float.valueOf(quote * 1024).longValue();
+			}
+				break;
+
+			case 'm': {
+				result = Float.valueOf(quote * 1024 * 1024).longValue();
+			}
+				break;
+
+			case 'g': {
+				result = Float.valueOf(quote * 1024 * 1024 * 1024).longValue();
+			}
+				break;
+
+			case 't': {
+				result = Float.valueOf(quote * 1024 * 1024 * 1024 * 1024)
+						.longValue();
+			}
+				break;
+
+			case 'p': {
+				result = Float
+						.valueOf(quote * 1024 * 1024 * 1024 * 1024 * 1024)
+						.longValue();
+			}
+				break;
+
+			default: {
+				result = 0;
+			}
+				break;
+			}
+		} else {
+			result = Float.valueOf(value).longValue();
+		}
+
+		return result;
+	}
+
+	/**
+	 * Covert a byte value to a human representation
+	 * 
+	 * @param bytes
+	 * @return A human representation from given value. (e.g. bytes=2048 => 2K)
+	 */
+	public static String convertFromBytes(final Long bytesLong) {
+		String quota = null;
+
+		final Float kilo = 1024f;
+		final Float mega = 1024f * 1024f;
+		final Float giga = 1024f * 1024f * 1024f;
+		final Float tera = 1024f * 1024f * 1024f * 1024f;
+		final Float peta = 1024f * 1024f * 1024f * 1024f * 1024f;
+		final Float exab = 1024f * 1024f * 1024f * 1024f * 1024f * 1024f;
+		;
+
+		final Float bytes = bytesLong.floatValue();
+
+		if (bytes == 0) {
+			quota = "0";
+		} else if ((bytes > 0) && (bytes < kilo)) {
+			quota = String.valueOf(bytes).concat("B");
+		} else if ((bytes >= kilo) && (bytes < mega)) {
+			quota = String.valueOf(Float.valueOf((bytes / kilo))).concat("K");
+		} else if ((bytes >= mega) && (bytes < giga)) {
+			quota = String.valueOf(Float.valueOf((bytes / mega))).concat("M");
+		} else if ((bytes >= giga) && (bytes < tera)) {
+			quota = String.valueOf(Float.valueOf((bytes / giga))).concat("G");
+		} else if ((bytes >= tera) && (bytes < peta)) {
+			quota = String.valueOf(Float.valueOf((bytes / tera))).concat("T");
+		} else if ((bytes >= peta) && (bytes < exab)) {
+			quota = String.valueOf(Float.valueOf((bytes / peta))).concat("P");
+		} else if ((bytes >= exab) && (bytes < (exab * 1024l))) {
+			quota = String.valueOf(Float.valueOf((bytes / exab))).concat("E");
+		}
+
+		return quota;
+	}
 
 	/**
 	 * Receive a string path and nomalize it.
@@ -130,6 +228,31 @@ public class Utils {
 	 */
 	public static String generateRandomUUID() {
 		return UUID.randomUUID().toString();
+	}
+
+	/**
+	 * Test if a host is reachable
+	 * 
+	 * @param host
+	 * @return
+	 */
+	public static boolean isHostReachable(final String host) {
+		boolean reachable = false;
+		try {
+			String os = System.getProperty("os.name");
+			Process p1;
+			if (os != null && os.startsWith("Windows")) {
+				p1 = java.lang.Runtime.getRuntime().exec("ping " + host);
+			} else {
+				// 'ping -c 1' does not work on Windows
+				p1 = java.lang.Runtime.getRuntime().exec("ping -c 1 " + host);
+			}
+			int returnVal = p1.waitFor();
+			reachable = (returnVal == 0);
+		} catch (Exception e) {
+		}
+
+		return reachable;
 	}
 
 	public static Set<PlaceObject> listAllPlacesVisible(Integer visibility,
