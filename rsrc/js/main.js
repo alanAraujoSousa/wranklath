@@ -228,6 +228,8 @@ $(document).ready(function () {
             mapX += 29;
             mapY += 29;
 
+            debugger;
+
             var grid = findTerrainWalkableProperties(unitX, unitY);
 
             var finder = new PF.AStarFinder({
@@ -302,6 +304,8 @@ $(document).ready(function () {
         // Grid array-like,
         var grid = new PF.Grid(60, 60);
 
+        debugger;
+
         if (allE != null && allE.length > 0) {
             for (var i = 0; i < allE.length; i++) {
                 var el = allE[i];
@@ -313,12 +317,14 @@ $(document).ready(function () {
                 elX += 29;
                 elY += 29;
 
-                if (elX > 59 || elY > 59)
+                if (elX > 59 || elY > 59 || elX < 0 || elY < 0)
                     continue;
 
                 grid.setWalkableAt(elX, elY, false);
             }
         }
+
+        debugger;
 
         for (var i = 0; i < 60; i++) {
             for (var j = 0; j < 60; j++) {
