@@ -51,6 +51,7 @@ public class Unit implements Serializable, TransportObjectInterface {
 		unitObject.setQuantity(getQuantity());
 		unitObject.setType(getType());
 		unitObject.setUserLogin(getUser().getLogin());
+		unitObject.setVisibility(getType().getVisibility());
 		return unitObject;
 	}
 
