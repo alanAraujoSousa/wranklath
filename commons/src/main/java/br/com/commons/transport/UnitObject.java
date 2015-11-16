@@ -25,6 +25,8 @@ public class UnitObject {
 	private CombatObject combatObject;
 	private String userLogin;
 	
+	private Integer visibility;
+	
 	// FIXME to remove or not :s
 	private Long targetId;
 
@@ -202,5 +204,19 @@ public class UnitObject {
 	 */
 	public void setUserLogin(String userLogin) {
 		this.userLogin = userLogin;
+	}
+
+	/**
+	 * @return the visibility
+	 */
+	public Integer getVisibility() {
+		return visibility;
+	}
+
+	/**
+	 * @param visibility the visibility to set
+	 */
+	public void setVisibility(Integer visibility) {
+		this.visibility = visibility;
 	}
 }
