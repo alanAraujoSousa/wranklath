@@ -51,13 +51,12 @@
                 <!-- filters -->
                 <filter id="visible">
                     <feComponentTransfer>
-                        <feFuncA type="table" tableValues="0 0.5" />
+                        <feFuncA type="table" tableValues="0 0.12" />
                     </feComponentTransfer>
                 </filter>
                 <filter id="enemy">
                     <feColorMatrix type="hueRotate" values="180" />
                 </filter>
-
             </defs>
             <g id="mapGroup" fill="none">
             </g>
@@ -66,16 +65,23 @@
             <g id="unitGroup" fill="none">
             </g>
             <g id="effectsGroup" fill="none">
-                <circle id="selectUnitEffect" r="71" stroke-dasharray="50,25" stroke-width="13" stroke="#00bf00" fill="none" style="display:none;"/>
-                <g id="selectMapEffect" style="display:none;">
-                    <line fill="none" stroke="#00bf00" stroke-width="13" stroke-dasharray="55,25" x1="0" y1="0" x2="100" y2="100"/>
-                    <line fill="none" stroke="#00bf00" stroke-width="13" stroke-dasharray="55,25" x1="0" y1="100" x2="100" y2="0"/>
+                <g id="visibleEffect" style="pointer-events:none;">
                 </g>
+                <circle id="selectUnitEffect" r="71" stroke-dasharray="50,25" stroke-width="13" stroke="#00bf00" fill="none" style="display:none;" />
                 <g id="movementEffects">
+                </g>
+                <g id="selectMapEffect" style="display:none;">
+                    <line fill="none" stroke="#00bf00" stroke-width="13" stroke-dasharray="55,25" x1="0" y1="0" x2="100" y2="100" />
+                    <line fill="none" stroke="#00bf00" stroke-width="13" stroke-dasharray="55,25" x1="0" y1="100" x2="100" y2="0" />
                 </g>
             </g>
         </svg>
-        <svg id="hud"></svg>
+    </div>
+    <div id="topHud" style="position:fixed;top: 0;width: 100%; height:7%;border: 10px dashed">
+
+    </div>
+    <div id="bottomHud" style="position:fixed;bottom: 0;width: 100%; height:20%;border: 10px dashed">
+
     </div>
 </body>
 

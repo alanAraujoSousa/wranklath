@@ -98,7 +98,7 @@ $(document).ready(function () {
         return cookie;
     };
 
-    function executeMovement(deque, unitClickedId) {
+    function restExecuteMovement(deque, unitClickedId) {
         unitClickedId = unitClickedId.replace('unit', ''); // delete prefix
         var url = move.replace('{id}', unitClickedId); // insert id on uri
         var token = getCookie("token");
@@ -114,7 +114,7 @@ $(document).ready(function () {
         });
     };
 
-    function retrieveEntitiesVisible() {
+    function restGetEntitiesVisible() {
         var token = getCookie("token");
         return $.ajax({
             url: allVisible,
@@ -125,7 +125,7 @@ $(document).ready(function () {
         });
     };
 
-    function retrieveUnitData() {
+    function restGetUnits() {
         var token = getCookie("token");
         return $.ajax({
             url: listUnits,
@@ -136,7 +136,7 @@ $(document).ready(function () {
         });
     };
 
-    function retrieveBuildingData() {
+    function restGetBuildings() {
         var token = getCookie("token");
         return $.ajax({
             url: listBuildings,
@@ -147,7 +147,7 @@ $(document).ready(function () {
         });
     };
 
-    function downloadMapDataChunck(index) {
+    function restDownloadMapChunk(index) {
         var url;
         url = "../js/map/map" + index + ".json";
         return $.ajax({
@@ -229,6 +229,7 @@ $(document).ready(function () {
             mapY += 29;
 
             var grid = findTerrainWalkableProperties(unitX, unitY);
+
             var finder = new PF.AStarFinder({
                 allowDiagonal: true,
                 dontCrossCorners: true
@@ -279,7 +280,7 @@ $(document).ready(function () {
                 mapToSendToBackEnd.push(y);
             }
 
-            var promise = executeMovement(mapToSendToBackEnd, unitClicked);
+            var promise = restExecuteMovement(mapToSendToBackEnd, unitClicked);
         }
         d3.event.stopPropagation();
     };
@@ -326,10 +327,31 @@ $(document).ready(function () {
                     isPassable = true;
                 } else {
                     if (grid.isWalkableAt(i, j)) {
-                        var map = d3.select('#x' + ((x - 29) + i) + 'y' + ((y - 29) + j))[0][0];
-                        if (map != null) {
-                            isPassable = isTerrainPassable(map.getAttribute('fill'));
-                        }
+                        var coorX = (x - 29) + i;
+                        var coorY = (y - 29) + j;
+
+                        var deltaX = coorX;
+                        var deltaY = coorY;
+                        if (deltaX % 100 == 0)
+                            deltaX--;
+                        if (deltaY % 100 == 0)
+                            deltaY--;
+                        deltaX = Number.parseInt(deltaX / 100);
+                        deltaY = Number.parseInt(deltaY / 100);
+                        var index = 1;
+                        index += deltaX * 50;
+                        index += deltaY;
+                        deltaX *= 100;
+                        deltaY *= 100;
+
+                        coorX = coorX - deltaX;
+                        coorY = coorY - deltaY;
+
+                        var terrainType = world[index][coorX - 1][coorY - 1];
+
+                        if (terrainType != 4)
+                            isPassable = true;
+
                     }
                 }
                 // isPassable = isPassable >>> 0;
@@ -365,7 +387,7 @@ $(document).ready(function () {
             console.log("Downloading map chunck: " + index);
             queueDownloadMapChunck.push(index);
             // promise
-            downloadMapDataChunck(index).always(function (data) {
+            restDownloadMapChunk(index).always(function (data) {
                 //remove download of queue
                 queueDownloadMapChunck.splice(queueDownloadMapChunck.indexOf(index), 1);
                 // store data of world
@@ -424,7 +446,7 @@ $(document).ready(function () {
     };
 
     function isTerrainPassable(type) {
-        if (type == "url(#water)")
+        if (type == 4)
             return false;
         return true;
     }
@@ -462,17 +484,152 @@ $(document).ready(function () {
         }
     };
 
+    function drawVisibilityRange() {
+        var all = new Array();
+        var units = dataBase.user.units;
+        var buildings = dataBase.user.buildings;
+
+        $.merge($.merge(all, buildings), units);
+
+        var g = d3.select('#visibleEffect');
+        g.selectAll("*").remove(); // for simple refresh
+
+        var visibles = {};
+        for (var it = 0; it < all.length; it++) {
+            el = all[it];
+            var x = el.place.x;
+            var y = el.place.y;
+
+            var visibility;
+            if (el.conclusionDate == null) // differ buildings of unit.
+                visibility = el.visibility;
+            else
+                visibility = 3
+
+            var delta = 0;
+
+            if (visibility != 2) {
+                if (visibility % 3 == 0) { // divisors
+                    delta = visibility / 3;
+                } else if ((visibility + 1) % 3 == 0) { // adjacents
+                    delta = (visibility + 1) / 3;
+                    delta--;
+                } else { // fails
+                    delta = (visibility - 1) / 3;
+                    delta--;
+                }
+            }
+
+            var cont = visibility + delta + 1;
+            var x2;
+            var y2;
+            x2 = x;
+            y2 = y + visibility;
+            for (var i = 1; i <= cont; i++) {
+                for (var j = 0; j <= (y2 - y); j++) {
+                    var mY = (y + j);
+                    visibles['x' + x2 + 'y' + mY] = [x2, mY];
+                }
+                if (x2 < x + visibility) {
+                    x2++;
+                }
+                if (i > delta) {
+                    y2--;
+                }
+            }
+
+            x2 = x;
+            y2 = y + visibility;
+            for (var i = 1; i <= cont; i++) {
+                for (var j = 0; j <= (y2 - y); j++) {
+                    var mY = (y + j);
+                    visibles['x' + x2 + 'y' + mY] = [x2, mY];
+                }
+                if (x2 > x - visibility) {
+                    x2--;
+                }
+                if (i > delta) {
+                    y2--;
+                }
+            }
+
+            x2 = x;
+            y2 = y - visibility;
+            for (var i = 1; i <= cont; i++) {
+                for (var j = 0; j <= (y - y2); j++) {
+                    var mY = (y - j);
+                    visibles['x' + x2 + 'y' + mY] = [x2, mY];
+                }
+                if (x2 > x - visibility) {
+                    x2--;
+                }
+                if (i > delta) {
+                    y2++;
+                }
+            }
+
+            x2 = x;
+            y2 = y - visibility;
+            for (var i = 1; i <= cont; i++) {
+                for (var j = 0; j <= (y - y2); j++) {
+                    var mY = (y - j);
+                    visibles['x' + x2 + 'y' + mY] = [x2, mY];
+                }
+                if (x2 < x + visibility) {
+                    x2++;
+                }
+                if (i > delta) {
+                    y2++;
+                }
+            }
+        }
+
+        for (var key in visibles) {
+            var place = visibles[key];
+            g.append("rect")
+                .attr("id", key)
+                .attr("filter", "url(#visible)")
+                .attr("x", place[0] * gridCellSize)
+                .attr("y", place[1] * gridCellSize)
+                .attr("width", gridCellSize)
+                .attr("height", gridCellSize)
+                .attr("fill", "yellow");
+        }
+    };
+
     function stalkEntities() {
         setInterval(function () {
             var promise = downloadNewEntities();
             $.when(promise).done(function () {
                 drawEntitiesVisible();
+                drawVisibilityRange();
             });
         }, 5000); // draw all
     };
 
+    function stalkEmptyWorld() {
+        setInterval(function () {
+            // top, left corner.
+            var initX = panZoom.getPan().x;
+            var initY = panZoom.getPan().y;
+            initX = Number.parseInt(initX / 100);
+            initY = Number.parseInt(initY / 100);
+
+            // Only calc coordinates positives.
+            if (initX < 0)
+                initX *= -1;
+
+            if (initY < 0)
+                initY *= -1;
+
+            drawMapVisible(initX, initY);
+        }, 5000);
+
+
+    }
+
     function downloadNewEntities() {
-        var prom = retrieveEntitiesVisible();
+        var prom = restGetEntitiesVisible();
         prom.always(function (data) {
             dataBase.user.units = [];
             dataBase.user.buildings = [];
@@ -507,8 +664,6 @@ $(document).ready(function () {
         var type = entity.type;
         var id = entity.id;
         var login = entity.userLogin;
-
-        debugger;
 
         var name;
         if (entity.conclusionDate == null) {
@@ -549,6 +704,9 @@ $(document).ready(function () {
 
     function drawEntitiesVisible() {
 
+        d3.select("#buildingGroup").selectAll("*").remove();
+        d3.select("#unitGroup").selectAll("*").remove();
+
         // top, left corner.
         var initX = panZoom.getPan().x;
         var initY = panZoom.getPan().y;
@@ -571,8 +729,6 @@ $(document).ready(function () {
         var all = new Array();
         $.merge($.merge(all, buildings), buildingsE);
         $.merge($.merge(all, units), unitsE);
-
-        debugger;
 
         for (var i = 0; i < all.length; i++) {
             var entity = all[i];
@@ -614,6 +770,7 @@ $(document).ready(function () {
 
         // Draw initial map
         drawMapVisible(initX, initY);
+        stalkEmptyWorld();
 
         // pan to initial position.
         // TODO put initial coordinates on center of map.
