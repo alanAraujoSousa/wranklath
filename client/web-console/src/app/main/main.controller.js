@@ -2,38 +2,74 @@
   'use strict';
 
   angular
-    .module('wranklath')
-    .controller('MainController', MainController);
+  .module('wranklath')
+  .controller('MainController', MainController);
 
   /** @ngInject */
-  function MainController($timeout, webDevTec, toastr) {
+  function MainController($timeout, toastr) {
     var vm = this;
 
-    vm.awesomeThings = [];
     vm.classAnimation = '';
-    vm.creationDate = 1450674116110;
     vm.showToastr = showToastr;
 
     activate();
 
+    function signIn() {
+
+    }
+
+    function signUp() {
+
+    }
+
+    function forgotPass() {
+
+    }
+
+
     function activate() {
-      getWebDevTec();
       $timeout(function() {
         vm.classAnimation = 'rubberBand';
       }, 4000);
     }
 
     function showToastr() {
-      toastr.info('Fork <a href="https://github.com/Swiip/generator-gulp-angular" target="_blank"><b>generator-gulp-angular</b></a>');
+      toastr.info('toastShow');
       vm.classAnimation = '';
-    }
-
-    function getWebDevTec() {
-      vm.awesomeThings = webDevTec.getTec();
-
-      angular.forEach(vm.awesomeThings, function(awesomeThing) {
-        awesomeThing.rank = Math.random();
-      });
     }
   }
 })();
+
+/*
+
+  Use the directives to manipulate the dom.
+
+  var options = {
+	  'btn-loading': '<i class="fa fa-spinner fa-pulse"></i>',
+	  'btn-success': '<i class="fa fa-check"></i>',
+	  'btn-error': '<i class="fa fa-remove"></i>',
+  };
+
+  function remove_loading($form)
+  {
+  	$form.find('[type=submit]').removeClass('error success');
+  	$form.find('.login-form-main-message').removeClass('show error success').html('');
+  }
+
+  function form_loading($form)
+  {
+    $form.find('[type=submit]').addClass('clicked').html(utils['btn-loading']);
+  }
+
+  function form_success($form)
+  {
+	  $form.find('[type=submit]').addClass('success').html(options['btn-success']);
+	  $form.find('.login-form-main-message').addClass('show success').html("All Good! Redirecting...");
+  }
+
+  function form_failed($form)
+  {
+  	$form.find('[type=submit]').addClass('error').html(options['btn-error']);
+  	$form.find('.login-form-main-message').addClass('show error').html("Wrong login credentials!");
+  }
+*/

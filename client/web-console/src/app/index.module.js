@@ -2,6 +2,15 @@
   'use strict';
 
   angular
-    .module('wranklath', ['ngAnimate', 'ngCookies', 'ngSanitize', 'ngMessages', 'ngResource', 'ngRoute', 'ui.bootstrap', 'toastr']);
+    .module('wranklath',
+    ['ngAnimate',
+    'ngCookies',
+    'ngSanitize',
+    'ngMessages',
+    'ngAria',
+    'ngResource',
+    'ngRoute',
+    'ui.bootstrap',
+    'toastr']);
 
 })();

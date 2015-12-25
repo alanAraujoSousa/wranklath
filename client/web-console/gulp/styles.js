@@ -3,11 +3,8 @@
 var path = require('path');
 var gulp = require('gulp');
 var conf = require('./conf');
-
 var browserSync = require('browser-sync');
-
 var $ = require('gulp-load-plugins')();
-
 var wiredep = require('wiredep').stream;
 var _ = require('lodash');
 
@@ -25,11 +22,17 @@ var buildStyles = function() {
     style: 'expanded'
   };
 
+  /**
+    The files to put in injectOptions.
+  */
   var injectFiles = gulp.src([
     path.join(conf.paths.src, '/app/**/*.scss'),
     path.join('!' + conf.paths.src, '/app/index.scss')
   ], { read: false });
 
+  /**
+    Where and how put injectFiles.
+  */
   var injectOptions = {
     transform: function(filePath) {
       filePath = filePath.replace(conf.paths.src + '/app/', '');

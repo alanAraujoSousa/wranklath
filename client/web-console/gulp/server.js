@@ -11,6 +11,8 @@ var util = require('util');
 
 var proxyMiddleware = require('http-proxy-middleware');
 
+var qrcode = require('qrcode-terminal');
+
 function browserSyncInit(baseDir, browser) {
   browser = browser === undefined ? 'default' : browser;
 
@@ -39,6 +41,8 @@ function browserSyncInit(baseDir, browser) {
     startPath: '/',
     server: server,
     browser: browser
+  }, function(err, bs) {
+    qrcode.generate(bs.options.get('urls').get('external'));
   });
 }
 
