@@ -1,1 +1,68 @@
-game Main
+<div id="map" style="width: 100%; height: 100%; border:1px solid black; ">
+  <svg id="paper" xmlns="http://www.w3.org/2000/svg" style="display: inline; width: 100%; height: 100%;" version="1.1">
+    <defs>
+      <!-- TODO: create a single pattern, for each tilesheet be reused in each entity.-->
+
+      <!-- Patterns of Terrains -->
+      <pattern id="grassland" patternUnits="userSpaceOnUse" width="100" height="100" x="0" y="0" viewBox="5 36 55 55">
+        <image xlink:href="../assets/map/tileset.png" x="0" y="0" width="512" height="384"></image>
+      </pattern>
+      <pattern id="forest" patternUnits="userSpaceOnUse" width="100" height="100" x="0" y="0" viewBox="37 36 55 55">
+        <image xlink:href="../assets/map/tileset.png" x="0" y="0" width="512" height="384"></image>
+      </pattern>
+
+      <!-- Patterns of Units -->
+      <pattern id="cavalary" patternUnits="userSpaceOnUse" width="100" height="100" x="0" y="0" viewBox="0 50 40 40">
+        <image xlink:href="../assets/sprites/units/units.jpg" x="0" y="0" width="425" height="388"></image>
+      </pattern>
+      <pattern id="archer" patternUnits="userSpaceOnUse" width="100" height="100" x="0" y="0" viewBox="0 98 40 40">
+        <image xlink:href="../assets/sprites/units/units.jpg" x="0" y="0" width="425" height="388"></image>
+      </pattern>
+      <pattern id="infantry" patternUnits="userSpaceOnUse" width="100" height="100" x="0" y="0" viewBox="58 50 40 40">
+        <image xlink:href="../assets/sprites/units/units.jpg" x="0" y="0" width="425" height="388"></image>
+      </pattern>
+
+      <!-- Patterns of buildings -->
+      <pattern id="town" patternUnits="userSpaceOnUse" width="100" height="100" x="0" y="0" viewBox="125 241 40 40">
+        <image xlink:href="../assets/sprites/units/units.jpg" x="0" y="0" width="425" height="388"></image>
+      </pattern>
+
+      <!-- filters -->
+      <filter id="visible">
+        <feComponentTransfer>
+          <feFuncA type="table" tableValues="0 0.12" />
+        </feComponentTransfer>
+      </filter>
+      <filter id="enemy">
+        <feColorMatrix type="hueRotate" values="180" />
+      </filter>
+    </defs>
+    <g id="mapGroup" fill="none">
+    </g>
+    <g id="buildingGroup" fill="none">
+    </g>
+    <g id="unitGroup" fill="none">
+    </g>
+    <g id="effectsGroup" fill="none">
+      <g id="visibleEffect" style="pointer-events:none;">
+      </g>
+      <circle id="selectUnitEffect" r="71" stroke-dasharray="50,25" stroke-width="13" stroke="#00bf00" fill="none" style="display:none;" />
+      <g id="movementEffects">
+      </g>
+      <g id="selectMapEffect" style="display:none;">
+        <line fill="none" stroke="#00bf00" stroke-width="13" stroke-dasharray="55,25" x1="0" y1="0" x2="100" y2="100" />
+        <line fill="none" stroke="#00bf00" stroke-width="13" stroke-dasharray="55,25" x1="0" y1="100" x2="100" y2="0" />
+      </g>
+      <g id="attackEffect" style="display:none;">
+        <line fill="none" stroke="#FF0000" stroke-width="13" stroke-dasharray="55,25" x1="0" y1="0" x2="100" y2="100" />
+        <line fill="none" stroke="#FF0000" stroke-width="13" stroke-dasharray="55,25" x1="0" y1="100" x2="100" y2="0" />
+      </g>
+    </g>
+  </svg>
+</div>
+<div id="topHud" style="position:fixed;top: 0;width: 100%; height:7%;border: 10px dashed">
+
+</div>
+<div id="bottomHud" style="position:fixed;bottom: 0;width: 100%; height:20%;border: 10px dashed">
+
+</div>
