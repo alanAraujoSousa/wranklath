@@ -2,13 +2,24 @@
   angular.module('wranklath')
   .factory('util.service', [
     '$cookies',
+    '$http,'
     'BASE_DOMAIN',
     'BASE_PORT',
     'BASE_API',
-    function($cookies, domain, port, api) {
+    function($cookies, $http, domain, port, api) {
       return {
+        
         getBaseUrl : function() {
           return 'http://' + domain + ':' + port + api;
+        },
+
+        downloadMapChunck : function(index) {
+          var url = './assets/map/data/map' + index + '.json';
+          var prom = $http({
+            url: url,
+            method: 'GET'
+          });
+          return prom;
         }
       }
 
