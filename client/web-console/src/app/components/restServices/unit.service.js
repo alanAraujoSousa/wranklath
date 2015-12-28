@@ -11,9 +11,9 @@
           var url = utilService.getBaseUrl() + '/unit/{id}/attack/{enemy}';
           unitId = unitId.replace('unit', '');
           enemyId = enemyId.replace('unit', '');
-          url = url.replace('{id}', myUnitId);
-          url = url.replace('{enemy}', enemyUnitId);
-          var token = $cookies.getCookie('token');
+          url = url.replace('{id}', unitId);
+          url = url.replace('{enemy}', enemyId);
+          var token = $cookies.get('token');
           var prom = $http({
             method: 'POST',
             url: url,
@@ -23,13 +23,13 @@
             }
           });
           return prom;
-        }
+        },
 
         executeMovement : function(steps, unitClicked) {
-          unitClickedId = unitClickedId.replace('unit', '');
+          unitClicked = unitClicked.replace('unit', '');
           var url = utilService.getBaseUrl() + '/unit/{id}/move';
           url = url.replace('{id}', unitClicked);
-          var token = $cookies.getCookie("token");
+          var token = $cookies.get("token");
           var prom = $http({
             method: 'POST',
             url: url,
@@ -43,7 +43,7 @@
 
         listUnits : function() {
           var url = utilService.getBaseUrl() + '/user/unit';
-          var token = $cookies.getCookie("token");
+          var token = $cookies.get("token");
           var prom = $http({
             url: url,
             method: 'GET',

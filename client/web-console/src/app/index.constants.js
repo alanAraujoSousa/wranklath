@@ -8,5 +8,6 @@
     .constant('moment', moment)
     .constant('BASE_DOMAIN', '127.0.0.1')
     .constant('BASE_PORT', '8080')
-    .constant('BASE_API', '/wranklath/rest');
+    .constant('BASE_API', '/wranklath/rest')
+    .constant('GRID_CELL_SIZE','100');
 })();

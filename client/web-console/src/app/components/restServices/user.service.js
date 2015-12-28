@@ -9,10 +9,11 @@
       return {
         login : function(data) {
           var url = utilService.getBaseUrl() + '/user/login';
-
+          var login = data.login;
           var prom = $http.post(url, data);
-          prom.success(function(data) {
-            $cookies.put('token', data);
+          prom.success(function(dataReceived) {
+            $cookies.put('token', dataReceived);
+            $cookies.put('user', login);
           });
           return prom;
         },
@@ -28,7 +29,7 @@
 
         listAllVisible : function() {
           var url = utilService.getBaseUrl() + "/user/allvisible";
-          var token = $cookies.getCookie('token');
+          var token = $cookies.get('token');
           var prom = $http({
             url: url,
             method: 'GET',

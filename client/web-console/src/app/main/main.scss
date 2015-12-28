@@ -5,7 +5,8 @@ $background: #efefef;
 html,
 body {
   background: $background;
-  padding: 10px;
+  width: 100% !important; 
+  height: 100% !important;
 }
 
 /*=== 2. Misc ===*/

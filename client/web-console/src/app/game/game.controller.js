@@ -4,9 +4,11 @@
   .controller('GameController', [
     'user.service',
     'unit.service',
-    'building.service'
-    function(userService, unitService, buildingService) {
-      var vm = this;
+    'building.service',
+    'util.service',
+    'GRID_CELL_SIZE',
+    function(userService, unitService, buildingService, utilService, GRID_CELL_SIZE) {
+      var vm = new Object();
 
       vm.user = new Object();
       vm.user.buildings = [];
@@ -21,14 +23,19 @@
       vm.queueDownloadMapChunck = new Array();
       vm.panZoom = new Object();
 
-      generateInitialMap();
+      downloadNewEntities().success(function() {
+        debugger;
+        generateInitialMap();
+      });
+
 
       function generateInitialMap() {
         // Get initial position.
         var towns = vm.user.buildings;
         var initialPlace = {};
+        debugger;
         if (towns.length > 0) {
-          var initialPlace = towns[0].place;
+          initialPlace = towns[0].place;
         } else {
           var armys = vm.user.units;
           if (armys.length > 0) {
@@ -61,7 +68,7 @@
         });
 
         stalkEntities();
-      };
+      }
 
       function clearMapMarks() {
         d3.select("#path").remove();
@@ -104,12 +111,11 @@
           var excludePlaces = getVisiblePlaces(eX, eY, atkRange - 1);
           var mapToSendToBackEnd = drawPathTo(unitX, unitY, eX, eY, excludePlaces);
 
-          debugger;
           // var promise = restExecuteMovement(mapToSendToBackEnd, unitClicked);
         }
 
         d3.event.stopPropagation();
-      };
+      }
 
       function handleMyUnitClick() {
         var unit = d3.event.target;
@@ -118,24 +124,24 @@
         var y = Number(unit.getAttribute("y"));
 
         var effect = d3.select("#selectUnitEffect");
-        if (id != unitClicked) {
-          unitClicked = id;
+        if (id != vm.unitClicked) {
+          vm.unitClicked = id;
           var factor = GRID_CELL_SIZE / 2; // Factor is only to centralize.
           effect.attr("transform", "translate(" + (x + factor) + "," + (y + factor) + ")");
           effect.attr("style", "display:true;");
         } else {
-          unitClicked = null;
+          vm.unitClicked = null;
           effect.attr("style", "display:none;");
         }
 
         clearMapMarks();
 
         d3.event.stopPropagation();
-      };
+      }
 
       function handleMapClick() {
         // if we have a unit selected, this is how we differ buildings to units.
-        if (unitClicked != null && unitClicked.search("unit") >= 0) {
+        if (vm.unitClicked != null && vm.unitClicked.search("unit") >= 0) {
           var map = d3.event.target;
           var id = map.getAttribute("id");
           var mapX = Number(map.getAttribute("x"));
@@ -149,17 +155,17 @@
           effect.attr("transform", "translate(" + mapX + "," + mapY + ")");
           effect.attr("style", "display:true;");
 
-          var unit = d3.select("#" + unitClicked)[0][0];
+          var unit = d3.select("#" + vm.unitClicked)[0][0];
           var unitX = unit.getAttribute("x") / GRID_CELL_SIZE;
           var unitY = unit.getAttribute("y") / GRID_CELL_SIZE;
           mapX /= GRID_CELL_SIZE;
           mapY /= GRID_CELL_SIZE;
 
           var mapToSendToBackEnd = drawPathTo(unitX, unitY, mapX, mapY, null);
-          var promise = unitService.executeMovement(mapToSendToBackEnd, unitClicked);
+          var promise = unitService.executeMovement(mapToSendToBackEnd, vm.unitClicked);
         }
         d3.event.stopPropagation();
-      };
+      }
 
       function drawPathTo(unitX, unitY, mapX, mapY, excludePlaces) {
         mapX = (mapX - unitX) + 29;
@@ -324,7 +330,7 @@
           case 194234:
           return "url(#barracks)";
         }
-      };
+      }
 
       function getUnit(code) {
         switch (code) {
@@ -335,7 +341,7 @@
           case 202356:
           return "url(#archer)";
         }
-      };
+      }
 
       function getTerrain(code) {
         switch (code) {
@@ -348,7 +354,7 @@
           case 4:
           return "url(#water)";
         }
-      };
+      }
 
       // FIXME this method is very stupid.
       function getVisiblePlaces(x, y, visibility) {
@@ -445,7 +451,7 @@
         }
 
         return visibles;
-      };
+      }
 
       function drawVisibilityRange() {
         var all = new Array();
@@ -486,7 +492,7 @@
           .attr("height", GRID_CELL_SIZE)
           .attr("fill", "yellow");
         }
-      };
+      }
 
       function stalkEntities() {
         setInterval(function () {
@@ -496,7 +502,7 @@
             drawVisibilityRange();
           });
         }, 3000); // draw all
-      };
+      }
 
       function stalkEmptyWorld() {
         setInterval(function () {
@@ -521,7 +527,8 @@
 
       function downloadNewEntities() {
         var prom = userService.listAllVisible();
-        prom.always(function (data) {
+        prom.success(function (data) {
+          debugger;
           vm.user.units = [];
           vm.user.buildings = [];
           vm.enemy.units = [];
@@ -532,7 +539,7 @@
 
               var login = el.userLogin;
               var owner;
-              if (login != getCookie("user"))
+              if (login != utilService.getUser())
               owner = vm.enemy;
               else
               owner = vm.user;
@@ -547,7 +554,7 @@
           }
         });
         return prom;
-      };
+      }
 
       function drawEntity(entity) {
         var x = entity.place.x;
@@ -586,13 +593,13 @@
         .attr("height", GRID_CELL_SIZE)
         .attr("fill", type);
 
-        if (login != getCookie("user")) {
+        if (login != utilService.getUser()) {
           rect.attr("filter", "url(#enemy)");
           rect.on("click", handleEnemyClick);
         } else {
           rect.on("click", handleMyUnitClick);
         }
-      };
+      }
 
       function drawEntitiesVisible() {
 
@@ -631,7 +638,7 @@
           ((initY - range) <= targetY && (initY + range) >= targetY))
           drawEntity(entity);
         }
-      };
+      }
 
       function drawMapVisible(x, y) {
         drawMap(x, y + 50);
@@ -642,7 +649,7 @@
         drawMap(x - 50, y);
         drawMap(x - 50, y - 50);
         drawMap(x - 50, y - 50);
-      };
+      }
 
       function drawMap(initX, initY) {
         var info = getInfoMapChunck(initX, initY);
@@ -658,7 +665,7 @@
           console.log("Downloading map chunck: " + index);
           vm.queueDownloadMapChunck.push(index);
           // promise
-          utilService.downloadMapChunck(index).always(function (data) {
+          utilService.downloadMapChunck(index).success(function (data) {
             //remove download of queue
             vm.queueDownloadMapChunck.splice(vm.queueDownloadMapChunck.indexOf(index), 1);
             // store data of world
@@ -666,7 +673,7 @@
             paint(index, deltaX, deltaY);
           });
         }
-      };
+      }
 
       function getInfoMapChunck(initX, initY) {
         var deltaX = initX;
@@ -688,7 +695,7 @@
         info.deltaX = deltaX;
         info.deltaY = deltaY;
         return info;
-      };
+      }
 
       function paint(index, deltaX, deltaY) {
         var isPainted = d3.select("#map" + index)[0][0] != null;
@@ -713,7 +720,9 @@
             }
           }
         }
-      };
+      }
 
-    }]);
+    }
+
+    ]);
   })();

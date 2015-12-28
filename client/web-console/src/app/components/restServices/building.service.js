@@ -10,7 +10,7 @@
 
         listBuildings : function() {
           var url = utilService.getBaseUrl() + '/user/building';
-          var token = $cookies.getCookie("token");
+          var token = $cookies.get("token");
           var prom = $http({
             url: url,
             method: 'GET',
