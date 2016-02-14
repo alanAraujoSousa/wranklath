@@ -123,7 +123,7 @@ public class MovementScheduler {
 		// Get error margin.
 		Integer diff = (int) (now.getTime() - timeToNextMove.getTime());
 		if (diff != 0) {
-			LOGGER.debug("Error margin: " + diff + " on movement of: "
+			LOGGER.debug("Error margin: " + diff + " on movement of unit: "
 					+ unitObject.getId() + ", time: " + now);
 		}
 

@@ -26,6 +26,9 @@
         },
 
         executeMovement : function(steps, unitClicked) {
+          steps.shift();
+          steps.shift();
+
           unitClicked = unitClicked.replace('unit', '');
           var url = utilService.getBaseUrl() + '/unit/{id}/move';
           url = url.replace('{id}', unitClicked);

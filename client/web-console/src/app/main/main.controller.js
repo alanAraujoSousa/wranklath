@@ -10,7 +10,7 @@
 
       vm.login = function(user) {
         var prom = userService.login(user);
-        prom.always(function() {
+        prom.success(function() {
           $location.url('/game');
         });
       }
