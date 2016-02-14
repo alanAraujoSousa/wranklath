@@ -1,5 +1,5 @@
 (function() {
-  angular.module('wranklath')
+  angular.module('rest')
   .factory("user.service", [
     'util.service',
     '$http',
