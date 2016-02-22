@@ -1,5 +1,7 @@
 <div id="map" style="width: 100%; height: 100%; border:1px solid black; ">
   <svg id="paper" xmlns="http://www.w3.org/2000/svg" style="display: inline; width: 100%; height: 100%;" version="1.1">
+
+
     <defs>
       <!-- TODO: create a single pattern, for each tilesheet be reused in each entity.-->
 
@@ -37,12 +39,22 @@
         <feColorMatrix type="hueRotate" values="180" />
       </filter>
     </defs>
-    <g id="mapGroup" fill="none">
+
+
+    <g main-map id="mapGroup" fill="none">
     </g>
-    <g id="buildingGroup" fill="none">
+
+    <!-- Entities group -->
+    <g main-entity id="entityGroup">
+
+        <g id="unitGroup" fill="none">
+        </g>
+
+        <g id="buildingGroup" fill="none">
+        </g>
+
     </g>
-    <g id="unitGroup" fill="none">
-    </g>
+
     <g id="effectsGroup" fill="none">
       <g id="visibleEffect" style="pointer-events:none;">
       </g>
@@ -58,11 +70,15 @@
         <line fill="none" stroke="#FF0000" stroke-width="13" stroke-dasharray="55,25" x1="0" y1="100" x2="100" y2="0" />
       </g>
     </g>
+
   </svg>
 </div>
+
+
 <div id="topHud" style="position:fixed;top: 0;width: 100%; height:7%;border: 10px dashed">
 
 </div>
+
 <div id="bottomHud" style="position:fixed;bottom: 0;width: 100%; height:20%;border: 10px dashed">
 
 </div>

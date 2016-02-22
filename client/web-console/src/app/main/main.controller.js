@@ -11,7 +11,7 @@
       vm.login = function(user) {
         var prom = userService.login(user);
         prom.success(function() {
-          $location.url('/game');
+          $location.url('/map');
         });
       }
 

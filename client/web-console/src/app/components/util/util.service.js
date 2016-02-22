@@ -160,6 +160,10 @@
           }
         },
 
+        getVisibleTexture : function() {
+          return "url(#visible)";
+        },
+
         getTerrainSvgTexture : function(code) {
           switch (code) {
             case 1:
@@ -185,7 +189,7 @@
           } else {
             return true;
           }
-        }
+        },
       }
     }]);
 })();

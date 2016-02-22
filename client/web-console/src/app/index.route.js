@@ -12,10 +12,10 @@
         controller: 'MainController',
         controllerAs: 'main'
       })
-      .when('/game', {
-        templateUrl: 'app/game/game.html',
-        controller: 'GameController',
-        controllerAs: 'game'
+      .when('/map', {
+        templateUrl: 'app/map/map.html',
+        controller: 'MapController',
+        controllerAs: 'map'
       })
       .otherwise({
         redirectTo: '/'

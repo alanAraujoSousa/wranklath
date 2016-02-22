@@ -7,6 +7,9 @@
   .module('models', []);
 
   angular
+  .module('svg',[]);
+
+  angular
     .module('wranklath', [
       'ngAnimate',
       'ngCookies',
@@ -17,6 +20,7 @@
       'ngRoute',
       'ui.bootstrap',
       'rest',
-      'models'
+      'models',
+      'svg'
     ]);
 })();

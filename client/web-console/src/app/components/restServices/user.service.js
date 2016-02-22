@@ -4,7 +4,9 @@
     'util.service',
     '$http',
     '$cookies',
-    function(utilService, $http, $cookies) {
+    'unit.dao',
+    'building.dao',
+    function(utilService, $http, $cookies, unitDAO, buildingDAO) {
 
       return {
         login : function(data) {
@@ -36,6 +38,40 @@
             headers: {'token': token}
           });
 
+          return prom;
+        },
+
+        downloadNewEntities : function() {  
+          var prom = this.listAllVisible();
+          prom.success(function (data) {
+
+            unitDAO.clear();
+            buildingDAO.clear();
+
+            if (data != null && data.length > 0) {
+              for (var i = 0; i < data.length; i++) {
+                var el = data[i];
+
+                var entityOwner = el.userLogin;
+                var userLogged = utilService.getUser();
+
+                if (entityOwner == userLogged) {
+                          // FIXME find another way to differ builds and units.
+                          if (el.conclusionDate == null) { // This is for differ buildings and units
+                            unitDAO.addUnitToUser(el);
+                          } else {
+                            buildingDAO.addBuildingToUser(el);
+                          }
+                      } else {
+                          if (el.conclusionDate == null) { // This is for differ buildings and units
+                            unitDAO.addUnitToEnemy(el);
+                          } else {
+                            buildingDAO.addBuildingToEnemy(el);
+                          }
+                      }
+                  }
+              }
+          });
           return prom;
         }
       }
