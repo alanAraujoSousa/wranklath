@@ -13,7 +13,7 @@
 	</modules>
 
 	<properties>
-		<JUNIT_VERSION>4.11</JUNIT_VERSION>
+		<JUNIT_VERSION>4.13.1</JUNIT_VERSION>
 	</properties>
 	<dependencies>
 
